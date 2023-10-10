@@ -45,7 +45,7 @@ app.get('/voters', (req, res) => {
         }
 
         results.forEach(row => {
-            console.log(row.first_name);
+            console.log(row);
             voter_details.first_name = row.first_name;
             voter_details.last_name = row.last_name;
             voter_details.city = row.city;
