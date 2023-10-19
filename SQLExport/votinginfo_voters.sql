@@ -30,7 +30,10 @@ CREATE TABLE `voters` (
   `city` varchar(255) NOT NULL,
   `zipcode` int NOT NULL,
   `contact_no` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`voter_id`)
+  `user_id` varchar(150) NOT NULL,
+  PRIMARY KEY (`voter_id`),
+  KEY `user_id_foreign_idx` (`user_id`),
+  CONSTRAINT `user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -40,7 +43,7 @@ CREATE TABLE `voters` (
 
 LOCK TABLES `voters` WRITE;
 /*!40000 ALTER TABLE `voters` DISABLE KEYS */;
-INSERT INTO `voters` VALUES (101,'Vedansh','Airen','Seamans Center','Iowa City',52240,'3199367028'),(102,'Alec','R','Lindquest Center','Iowa City',52240,'19248928'),(103,'Joseph','B','MLHr','Iowa City',52240,'192480028');
+INSERT INTO `voters` VALUES (101,'Vedansh','Airen','Seamans Center','Iowa City',52240,'3199367028','vedairen@gmail.com'),(102,'Alec','R','Lindquest Center','Iowa City',52240,'19248928','alec@gmail.com'),(103,'Joseph','B','MLHr','Iowa City',52240,'192480028','joseph@gmail.com');
 /*!40000 ALTER TABLE `voters` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-09 22:19:30
+-- Dump completed on 2023-10-19 16:26:33
