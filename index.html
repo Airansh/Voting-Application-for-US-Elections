@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voter Information</title>
+</head>
+<body>
+    <form id="voterForm">
+        <label for="voter_id">Voter ID:</label><br>
+        <input type="text" id="voter_id" name="voter_id"><br>
+        <input type="submit" value="Submit">
+    </form>
+
+    <div id="voterInfo"></p>
+
+    <script>
+        document.getElementById('voterForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const voter_id = document.getElementById('voter_id').value;
+            fetch(`http://localhost:3000/voters?voter_id=${voter_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('voterInfo').innerHTML = `
+                        First Name: ${data.first_name} <br>
+                        Last Name: ${data.last_name} <br>
+                        City: ${data.city} <br>
+                        Zipcode: ${data.zipcode}
+                    `;
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
