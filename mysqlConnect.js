@@ -32,9 +32,9 @@ app.get('/Login',(req,res) =>{
     console.log("Login Page");
     res.sendFile('./views/login.html',{root: __dirname});
 })
-app.get('/SignUp',(req,res) =>{
-    console.log("SignUp Page");
-    res.sendFile('./views/signup.html',{root: __dirname});
+app.get('/RequestAccount',(req,res) =>{
+    console.log("Request Account Page");
+    res.sendFile('./views/request.html',{root: __dirname});
 })
 app.get('/ForgotPassword',(req,res) =>{
     console.log("ForgotPassword Page");
@@ -73,31 +73,24 @@ app.get('/voters', (req, res) => {
     });
 });
 io.on('connection', function(socket) {
-    console.log("New Client has connected")
+    //console.log("New Client has connected")
 
     socket.on('handshake', function (type) {
         if (type == 'frontend') {
             console.log('frontend has connected')
             socket.join('frontend')
+        }else if(type == 'requestPage'){
+            console.log('requestPage joined')
+            socket.join('requestPage')
         }
     });
-    socket.on('forgot', (data) => {
-        console.log(data)
-        let sql1 = "SELECT EXISTS(SELECT * FROM voters WHERE first_name = " + "'"+data.first+"' AND last_name = " +"'"
-            + data.last + "' AND contact_no = '" + data.phone + "')"
-        let exists;
-        db.query(sql1, (err, results) => {
-            if (err) {
-                throw err;
-            }
-            results.forEach(row=>{
-                console.log(results)
-                console.log(row)
-            });
-
-        });
-        console.log(exists)
-    });
+    socket.on('request',(data)=>{
+        console.log('Request Recieved:');
+        console.log(data);
+        //validate data
+        //if valid update database and send that they are all valid
+        //if not valid don't update database and send error code
+    })
 });
 
 server.listen(port, () => {
