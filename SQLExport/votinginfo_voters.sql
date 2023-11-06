@@ -31,6 +31,7 @@ CREATE TABLE `voters` (
                           `zipcode` int NOT NULL,
                           `age` int NOT NULL,
                           `driving_license` varchar(100) NOT NULL,
+                          `status` varchar(45) NOT NULL DEFAULT 'pending',
                           PRIMARY KEY (`email_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -41,6 +42,8 @@ CREATE TABLE `voters` (
 
 LOCK TABLES `voters` WRITE;
 /*!40000 ALTER TABLE `voters` DISABLE KEYS */;
+INSERT INTO `voters` VALUES ('vedairen@gmail.com','Vedansh','Airen','Seamans Center','Iowa City',52240,24,'DMV12344','pending');
+INSERT INTO `voters` VALUES ('jbartoszczyk@uiowa.edu','Joseph','Bartoszczyk','Seamans Center','Iowa City',52240,21,'DMV12345','pending');
 /*!40000 ALTER TABLE `voters` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,5 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-30 22:14:48
-
+-- Dump completed on 2023-11-03 14:24:06

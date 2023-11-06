@@ -16,7 +16,18 @@
             justify-items: center;
             align-items: center;
         }
-
+        #request-success-msg {
+            width: 30%;
+            text-align: center;
+            margin: 0;
+            padding: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            color: navajowhite;
+            border: 1px solid #8a0000;
+            background-color: green;
+            opacity: 0;
+        }
         #request-error-msg {
             width: 23%;
             text-align: center;
@@ -73,10 +84,16 @@
     </style>
 </head>
 <body>
+<a href = "http://localhost:3000">
+    <button >Home</button>
+</a>
 <main id="main-holder">
     <h1 id="request-header">Request Form</h1>
-
-    <form id="request-form">
+    <div id = "request-error-msg-holder">
+        <p id = "request-error-msg">Invalid Request!</p>
+        <p id = "request-success-msg">Requested!</p>
+    </div>
+    <form id="request-form" onsubmit="return false">
         <input type="text" name="firstName" id="first-name-field" class="request-form-field" placeholder="First Name">
         <input type="text" name="lastName" id="last-name-field" class="request-form-field" placeholder="Last Name">
         <input type="text" name="age" id="age-field" class="request-form-field" placeholder="Age">
@@ -86,11 +103,9 @@
         <input type="text" name="idNo" id="id-field" class="request-form-field" placeholder="ID no.">
         <input type="text" name="passport" id="passport-field" class="request-form-field" placeholder="Passport no.">
         <input type="text" name="email" id="email-field" class="request-form-field" placeholder="Email">
-        <input type="submit" value="Submit" id="request-form-submi" onclick ="request()">
+        <input type="submit" value="Submit" id="request-form-submit" onclick ="request()">
     </form>
-    <div id = "request-error-msg-holder">
-        <p id = "request-error-msg">Invalid Request</p>
-    </div>
+
 
 </main>
 </body>

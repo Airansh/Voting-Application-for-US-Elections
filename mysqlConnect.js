@@ -41,36 +41,7 @@ app.get('/ForgotPassword',(req,res) =>{
     res.sendFile('./views/forgotpassword.html',{root: __dirname});
 })
 app.get('/voters', (req, res) => {
-
-    let voter_id = 103 //take as an input from frontend
-    //example: http://localhost:3000/voters?voter_id=101
-
-    let voter_details = {
-        first_name: '',
-        last_name: '',
-        city: '',
-        zipcode: 0
-    } //we're fetching it from DB and sending it as result
-    
-
-    const sql = 'SELECT * FROM voters where voter_id = '+voter_id;
-    db.query(sql, (err, results) => {
-        if(err) {
-            throw err;
-        }
-
-        results.forEach(row => {
-            console.log(row.first_name);
-            voter_details.first_name = row.first_name;
-            voter_details.last_name = row.last_name;
-            voter_details.city = row.city;
-            voter_details.zipcode = row.zipcode;
-        
-        });
-        console.log(voter_details);
-        res.send(voter_details);
-        //take inputs into the frontend from voter_details for displaying
-    });
+    //old functionality
 });
 io.on('connection', function(socket) {
     //console.log("New Client has connected")
@@ -87,9 +58,28 @@ io.on('connection', function(socket) {
     socket.on('request',(data)=>{
         console.log('Request Recieved:');
         console.log(data);
-        //validate data
-        //if valid update database and send that they are all valid
-        //if not valid don't update database and send error code
+        const sql = 'SELECT 1 FROM voters WHERE email_id = '+"'"+data.email+"' ORDER BY email_id LIMIT 1"
+        db.query(sql, (err, results) => {
+            if(err) {
+                throw err;
+            }
+            if(results.length > 0){
+                console.log('already exists')
+            }else{
+                console.log('success')
+                const placeSql ='INSERT INTO voters(email_id,first_name,last_name,address,city,zipcode,age,driving_license) ' +
+                                'VALUES ('+"'"+data.email+"' , "+"'"+data.first+"' , "+"'"+data.last+"' , "
+                                +"'"+data.address+"' , "+"'"+data.city+"' , "+"'"+data.zipCode+"' , "+"'"+data.age+"' , "+"'"+data.id+"')"
+                db.query(placeSql,(err,results)=>{
+                    if(err){
+                        throw err;
+                    }
+                    console.log(results)
+                    console.log("added to database")
+                })
+            }
+        });
+
     })
 });
 
