@@ -28,7 +28,9 @@ app.get('/CreatePassword',(req,res) =>{
     console.log("Create Password Page");
     res.sendFile('./views/createPassword.html',{root: __dirname});
 });
-
+app.get('/Voter', (req, res) => {
+    res.sendFile('./views/voter.html', {root: __dirname});
+});
 app.get('/Admin', (req, res) => {
     res.sendFile('./views/admin.html', {root: __dirname});
 });
@@ -204,7 +206,7 @@ io.on('connection', function(socket) {
             if(results.length > 0) {
                 let tempData = {
                     user : voterId,
-                    //role : results.getString("role")
+                    role : results[0].role
                 }
                 console.log("successful login")
                 socket.emit('loginSuccess',tempData);

@@ -53,7 +53,13 @@
                 socket.emit('login', { voterId, password });
             });
             socket.on('loginSuccess',(data)=> {
-                alert('Successful login for user ' + data.user );
+                alert('Successful login for user ' + data.user + ", role:" + data.role);
+                console.log(data.role)
+                if(data.role == "admin"){
+                    location.href = 'http://localhost:3000/admin'
+                }else if(data.role == "voter"){
+                    location.href ='http://localhost:3000/Voter'
+                }
             });
 
             socket.on('loginFailed', function() {

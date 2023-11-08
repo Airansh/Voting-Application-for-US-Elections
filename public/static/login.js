@@ -10,6 +10,13 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
 });
 socket.on('loginSuccess',(data)=> {
     alert('Successful login for user ' + data.user + ", role:" + data.role);
+    console.log(data.role)
+    if(data.role == "admin"){
+        console.log("help")
+        location.href = 'http://localhost:3000/admin'
+    }else if(data.role === "voter"){
+        location.replace('https://localhost/voter');
+    }
 });
 
 socket.on('loginFailed', function() {
