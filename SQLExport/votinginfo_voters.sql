@@ -23,17 +23,16 @@ DROP TABLE IF EXISTS `voters`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `voters` (
-  `voter_id` int NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `address` varchar(255) NOT NULL,
-  `city` varchar(255) NOT NULL,
-  `zipcode` int NOT NULL,
-  `contact_no` varchar(45) DEFAULT NULL,
-  `user_id` varchar(150) NOT NULL,
-  PRIMARY KEY (`voter_id`),
-  KEY `user_id_foreign_idx` (`user_id`),
-  CONSTRAINT `user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+                          `email_id` varchar(255) NOT NULL,
+                          `first_name` varchar(100) NOT NULL,
+                          `last_name` varchar(100) NOT NULL,
+                          `address` varchar(255) NOT NULL,
+                          `city` varchar(255) NOT NULL,
+                          `zipcode` int NOT NULL,
+                          `age` int NOT NULL,
+                          `driving_license` varchar(100) NOT NULL,
+                          `status` varchar(45) NOT NULL DEFAULT 'pending',
+                          PRIMARY KEY (`email_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -43,7 +42,8 @@ CREATE TABLE `voters` (
 
 LOCK TABLES `voters` WRITE;
 /*!40000 ALTER TABLE `voters` DISABLE KEYS */;
-INSERT INTO `voters` VALUES (101,'Vedansh','Airen','Seamans Center','Iowa City',52240,'3199367028','vedairen@gmail.com'),(102,'Alec','R','Lindquest Center','Iowa City',52240,'19248928','alec@gmail.com'),(103,'Joseph','B','MLHr','Iowa City',52240,'192480028','joseph@gmail.com');
+INSERT INTO `voters` VALUES ('vedairen@gmail.com','Vedansh','Airen','Seamans Center','Iowa City',52240,24,'DMV12344','pending');
+INSERT INTO `voters` VALUES ('jbartoszczyk@uiowa.edu','Joseph','Bartoszczyk','Seamans Center','Iowa City',52240,21,'DMV12345','pending');
 /*!40000 ALTER TABLE `voters` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -56,4 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-19 16:26:33
+-- Dump completed on 2023-11-03 14:24:06

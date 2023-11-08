@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Voting Software</title>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="/public/static/request.js"></script>
+    <style>
+        html {
+            height: 100%;
+        }
+        #request-error-msg-holder {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            justify-items: center;
+            align-items: center;
+        }
+        #request-success-msg {
+            width: 30%;
+            text-align: center;
+            margin: 0;
+            padding: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            color: navajowhite;
+            border: 1px solid #8a0000;
+            background-color: green;
+            opacity: 0;
+        }
+        #request-error-msg {
+            width: 23%;
+            text-align: center;
+            margin: 0;
+            padding: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #8a0000;
+            border: 1px solid #8a0000;
+            background-color: #e58f8f;
+            opacity: 0;
+        }
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            display: grid;
+            justify-items: center;
+            align-items: center;
+
+        }
+        #request-form {
+            align-self: flex-start;
+            display: grid;
+            justify-items: center;
+            align-items: center;
+        }
+
+        .request-form-field::placeholder {
+            color: #3a3a3a;
+        }
+
+        .request-form-field {
+            border: none;
+            border-bottom: 1px solid #3a3a3a;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            outline: none;
+            padding: 0px 0px 5px 5px;
+            width: 100%
+        }
+
+        #request-form-submit {
+            width: 100%;
+            padding: 7px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            background-color: #3a3a3a;
+            cursor: pointer;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+<a href = "http://localhost:3000">
+    <button >Home</button>
+</a>
+<main id="main-holder">
+    <h1 id="request-header">Request Form</h1>
+    <div id = "request-error-msg-holder">
+        <p id = "request-error-msg">Invalid Request!</p>
+        <p id = "request-success-msg">Requested!</p>
+    </div>
+    <form id="request-form" onsubmit="return false">
+        <input type="text" name="firstName" id="first-name-field" class="request-form-field" placeholder="First Name">
+        <input type="text" name="lastName" id="last-name-field" class="request-form-field" placeholder="Last Name">
+        <input type="text" name="age" id="age-field" class="request-form-field" placeholder="Age">
+        <input type="text" name="address" id="address-field" class="request-form-field" placeholder="Address">
+        <input type="text" name="city" id="city-field" class="request-form-field" placeholder="City">
+        <input type="text" name="zipCode" id="zip-code-field" class="request-form-field" placeholder="Zip Code">
+        <input type="text" name="idNo" id="id-field" class="request-form-field" placeholder="ID no.">
+        <input type="text" name="passport" id="passport-field" class="request-form-field" placeholder="Passport no.">
+        <input type="text" name="email" id="email-field" class="request-form-field" placeholder="Email">
+        <input type="submit" value="Submit" id="request-form-submit" onclick ="request()">
+    </form>
+
+
+</main>
+</body>
+</html>
