@@ -1,14 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            width: 300px;
+            margin: 0 auto;
+        }
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
     <meta charset="UTF-8">
     <title>Login</title>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
   <script src="/public/static/script.js"></script>
 <!--  <script src="mysqlConnect.js"></script>-->
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+<!--    <script src = "/public/static/login.js"></script>-->
 </head>
 <body>
     <div>
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="voterId">Voter ID:</label><br>
+            <input type="text" id="voterId" name="voterId" required><br>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required><br>
+            <input type="submit" value="Submit">
+        </form>
+        <script>
+
+            socket.emit('handshake','frontend')
+            console.log("hello")
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const voterId = document.getElementById('voterId').value;
+                const password = document.getElementById('password').value;
+                console.log("sending data")
+                socket.emit('login', { voterId, password });
+            });
+            socket.on('loginSuccess',(data)=> {
+                alert('Successful login for user ' + data.user );
+            });
+
+            socket.on('loginFailed', function() {
+                alert('Invalid Login');
+            });
+        </script>
         <a href="http://localhost:3000/ForgotPassword">
             <button id = "ForgotPassword" class = "ForgotPassword">Forgot Password </button>
         </a>

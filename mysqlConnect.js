@@ -24,6 +24,11 @@ db.connect((err) => {
     }
     console.log('MySQL Connected...');
 });
+app.get('/CreatePassword',(req,res) =>{
+    console.log("Create Password Page");
+    res.sendFile('./views/createPassword.html',{root: __dirname});
+});
+
 app.get('/Admin', (req, res) => {
     res.sendFile('./views/admin.html', {root: __dirname});
 });
@@ -55,6 +60,7 @@ io.on('connection', function(socket) {
         }
         socket.emit('voterData', results);
     });
+
     socket.on('approveVoter', (email_id) => {
         const updateSql = 'UPDATE voters SET status = ? WHERE email_id = ?';
         db.query(updateSql, ['approved', email_id], (err, result) => {
@@ -116,7 +122,7 @@ io.on('connection', function(socket) {
                             from: 'vedtest5@yahoo.com', // sender address
                             to: email_id, // list of receivers
                             subject: 'Dear Voter, Please Generate Password', // Subject line
-                            text: `Your voter id is ${voter_id}, please use this Voter ID to login in, generate password and vote. \nPlease generate a password using the following link: http://yourwebsite.com` // plain text body
+                            text: `Your voter id is ${voter_id}, please use this Voter ID to login in, generate password and vote. \nPlease generate a password using the following link: http://localhost:3000/CreatePassword` // plain text body
                             // update the link in text above to be the link for Password Generation page
                         };
 
@@ -188,6 +194,50 @@ io.on('connection', function(socket) {
         });
 
     })
+    socket.on('login',(data)=>{
+        const { voterId, password } = data;
+        const selectSql = 'SELECT * FROM users WHERE voter_id = ? AND password = ?';
+        db.query(selectSql, [voterId,password], (err, results) => {
+            if(err) {
+                throw err;
+            }
+            if(results.length > 0) {
+                let tempData = {
+                    user : voterId,
+                    //role : results.getString("role")
+                }
+                console.log("successful login")
+                socket.emit('loginSuccess',tempData);
+            } else {
+                console.log("failed login")
+                socket.emit('loginFailed');
+            }
+        });
+
+    })
+    socket.on('createPassword', (data) => {
+        const { voterId, password } = data;
+        const selectSql = 'SELECT * FROM users WHERE voter_id = ? AND password IS NULL';
+        db.query(selectSql, [voterId], (err, results) => {
+            if(err) {
+                throw err;
+            }
+            if(results.length > 0) {
+                const updateSql = 'UPDATE users SET password = ? WHERE voter_id = ?';
+                db.query(updateSql, [password, voterId], (err, result) => {
+                    if(err) {
+                        throw err;
+                    }
+                    console.log('Password updated for voter');
+                    socket.emit('passwordUpdated');
+                });
+            } else {
+                console.log('Invalid voter ID or password already set');
+                socket.emit('passwordUpdateFailed');
+            }
+        });
+    });
+
 });
 
 server.listen(port, () => {
