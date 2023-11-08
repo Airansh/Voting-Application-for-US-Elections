@@ -3,11 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Voter</title>
+    <style>        #logoutButton {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    </style>
 </head>
 <body>
     <p>VOTER MAIN PAGE</p>
-    <a href="http://localhost:3000">
-        <button id = "login" class = "login">Sign Out</button>
-    </a>
+<button id="logoutButton">Logout</button>
 </body>
+<script>
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        if(confirm('Are you sure you want to logout?')) {
+            window.location.href = '/Logout';
+        }
+    });
+</script>
 </html>

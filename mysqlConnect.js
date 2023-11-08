@@ -12,7 +12,7 @@ app.use('/public', express.static('public'));
 const db = mysql.createConnection({
     host: 'localhost',
     port: 3306,
-    user: 'root',
+    user: 'vedansh',
     password: 'password',
     database: 'votinginfo'
 });
@@ -40,6 +40,10 @@ app.get('/', (req, res) => {
 });
 app.get('/Login',(req,res) =>{
     console.log("Login Page");
+    res.sendFile('./views/login.html',{root: __dirname});
+})
+app.get('/Logout',(req,res) =>{
+    console.log("Logged Out");
     res.sendFile('./views/login.html',{root: __dirname});
 })
 app.get('/RequestAccount',(req,res) =>{
