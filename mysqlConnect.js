@@ -164,6 +164,10 @@ io.on('connection', function(socket) {
             }
             if(results.length > 0){
                 console.log('already exists')
+                let data2 ={
+                    valid : "0"
+                }
+                socket.emit('validation',data2)
             }else{
                 console.log('success')
                 const placeSql ='INSERT INTO voters(email_id,first_name,last_name,address,city,zipcode,age,driving_license) ' +
@@ -176,6 +180,10 @@ io.on('connection', function(socket) {
                     console.log(results)
                     console.log("added to database")
                 })
+                let data1 ={
+                    valid : "1"
+                }
+                socket.emit('validation',data1)
             }
         });
 

@@ -31,7 +31,7 @@ function request(){
        valid_email =true;
     }
     if(valid_zip && valid_age && valid_email &&  !empty){
-        requestSuccess.style.opacity = 1;
+
         let request = {
             first : firstName,
             last : lastName,
@@ -47,7 +47,15 @@ function request(){
     }else{
         requestError.style.opacity = 1;
     }
-
+    socket.on('validation',(data)=>{
+        if(data.valid === "0"){
+            requestError.style.opacity = 1;
+        }else if(data.valid ==="1"){
+            requestSuccess.style.opacity = 1;
+        }else{
+            console.log("issue!")
+        }
+    })
 }
 
 
