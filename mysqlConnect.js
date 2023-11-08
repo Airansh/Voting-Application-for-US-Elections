@@ -11,9 +11,9 @@ app.use('/public', express.static('public'));
 // Create connection
 const db = mysql.createConnection({
     host: 'localhost',
-    port: 3306,
+    port: 3000,
     user: 'root',
-    password: 'password',
+    password: 'j3@s9rhTbt4Be4wZ',
     database: 'votinginfo'
 });
 
@@ -46,6 +46,10 @@ app.get('/ForgotPassword',(req,res) =>{
 app.get('/voters', (req, res) => {
     //old functionality
 });
+app.get('/signin',(req,res) =>{
+    console.log("Signin Page");
+    res.sendFile('./views/signin.html',{root: __dirname});
+});
 io.on('connection', function(socket) {
     //console.log("New Client has connected")
     const sql1 = `SELECT * FROM voters WHERE status='pending'`;
@@ -55,6 +59,15 @@ io.on('connection', function(socket) {
         }
         socket.emit('voterData', results);
     });
+    
+    const sql2 = `SELECT * FROM users`;
+    db.query(sql2, (err, results) => {
+        if(err) {
+            throw err;
+        }
+        socket.emit('validate', results);
+    });
+
     socket.on('approveVoter', (email_id) => {
         const updateSql = 'UPDATE voters SET status = ? WHERE email_id = ?';
         db.query(updateSql, ['approved', email_id], (err, result) => {
