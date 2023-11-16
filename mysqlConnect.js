@@ -34,6 +34,9 @@ app.get('/Voter', (req, res) => {
 app.get('/Admin', (req, res) => {
     res.sendFile('./views/admin.html', {root: __dirname});
 });
+app.get('/Logout', (req, res) => {
+    res.sendFile('./views/index.html', {root: __dirname});
+});
 app.get('/', (req, res) => {
     console.log('Connected to MySQL Database');
     res.sendFile('./views/index.html', {root: __dirname});
@@ -66,7 +69,50 @@ io.on('connection', function(socket) {
         }
         socket.emit('voterData', results);
     });
+    socket.on('ForgotPassword', (data)=>{
+        const sql = 'SELECT 1 FROM users WHERE email_id = '+"'"+data.email+"' AND voter_id = '" +
+            data.voterID+"' ORDER BY email_id LIMIT 1"
+        db.query(sql, (err, results) => {
+            if (err) {
+                throw err;
+            }
+            if (results.length > 0) {
+                let data1 = {
+                    valid: "1"
+                }
 
+                let transporter1 = nodemailer.createTransport({
+                    host: 'smtp.zoho.com',
+                    port: 465,
+                    secure: true, //ssl
+                    auth: {
+                        user:'vedtest5@yahoo.com',
+                        pass:'Testing@1'
+                    }
+                });
+                let mailOptions1 = {
+                    from: 'vedtest5@yahoo.com', // sender address
+                    to: data.email, // list of receivers
+                    subject: 'Dear Voter, Please Generate Password', // Subject line
+                    text: `Please generate a new password using the following link: http://localhost:3000/CreatePassword` // plain text body
+                };
+
+                transporter1.sendMail(mailOptions1, (error, info) => {
+                    if (error) {
+                        console.log('Error sending email:', error);
+                    } else {
+                        console.log('Email sent:', info.response);
+                    }
+                });
+                socket.emit('validationForgotPassword',data1)
+            }else{
+                let data2= {
+                    valid : "0"
+                }
+                socket.emit('validationForgotPassword',data2)
+            }
+        })
+    })
     socket.on('approveVoter', (email_id) => {
         const updateSql = 'UPDATE voters SET status = ? WHERE email_id = ?';
         db.query(updateSql, ['approved', email_id], (err, result) => {
