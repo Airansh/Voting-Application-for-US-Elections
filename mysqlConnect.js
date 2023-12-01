@@ -12,8 +12,8 @@ app.use('/public', express.static('public'));
 const db = mysql.createConnection({
     host: 'localhost',
     port: 3306,
-    user: 'vedansh',
-    password: 'password',
+    user: 'root',
+    password: 'j3@s9rhTbt4Be4wZ',
     database: 'votinginfo'
 });
 
@@ -33,6 +33,9 @@ app.get('/Voter', (req, res) => {
 });
 app.get('/Admin', (req, res) => {
     res.sendFile('./views/admin.html', {root: __dirname});
+});
+app.get('/manager', (req, res) => {
+    res.sendFile('./views/manager.html', {root: __dirname});
 });
 app.get('/Logout', (req, res) => {
     res.sendFile('./views/index.html', {root: __dirname});
