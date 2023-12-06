@@ -113,6 +113,22 @@ io.on('connection', function(socket) {
             }
         })
     })
+    socket.on('searchVoter',(data)=>{
+        let sql = ""
+        if(data.criteria === "name"){
+            sql = "SELECT * FROM voters WHERE first_name = '"+data.value+"'";
+        }else if(data.criteria ==="zipcode"){
+            sql = "SELECT * FROM voters WHERE Zipcode = '"+data.value+"'";
+        }
+        if(sql !== ""){
+            db.query(sql,(err, results) => {
+                if(err){
+                    throw err;
+                }
+                socket.emit('searchResults',results);
+            })
+        }
+    })
     socket.on('approveVoter', (email_id) => {
         const updateSql = 'UPDATE voters SET status = ? WHERE email_id = ?';
         db.query(updateSql, ['approved', email_id], (err, result) => {
