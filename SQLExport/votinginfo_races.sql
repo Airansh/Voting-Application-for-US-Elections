@@ -25,6 +25,9 @@ DROP TABLE IF EXISTS `races`;
 CREATE TABLE `races` (
                          `race_title` varchar(150) NOT NULL,
                          `Canidadates` JSON DEFAULT NULL,
+                         `zipcode` int (255) NOT NULL,
+                         FOREIGN KEY (`zipcode`) REFERENCES `precint` (`zipcode`)
+                         
                          PRIMARY KEY (`race_title`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

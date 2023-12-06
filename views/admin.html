@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <style>
         table, th, td {
@@ -11,6 +14,43 @@
             top: 10px;
             right: 10px;
         }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+        
     </style>
 </head>
 <body>
@@ -30,11 +70,39 @@
         <th>Deny</th>
     </tr>
 </table>
+<form id="electionForm">
+    <h2>Election Setup</h2>
 
+    <label for="electionTitle">Election Title:</label>
+    <input type="text" id="electionTitle" name="electionTitle" required>
+
+    <label for="precincts">Precincts:</label>
+    <input type="text" id="precincts" name="precincts" required>
+
+    <label for="races">Races:</label>
+    <input type="text" id="races" name="races" required>
+
+    <label for="candidates">Candidates:</label>
+    <input type="text" id="candidates" name="candidates" required>
+
+    <label for="startTime">Start Time:</label>
+    <input type="datetime-local" id="startTime" name="startTime" required>
+
+    <label for="endTime">End Time:</label>
+    <input type="datetime-local" id="endTime" name="endTime" required>
+
+    <button type="button" onclick="submitForm()">Submit</button>
+</form>
   
 <script src="/socket.io/socket.io.js"></script>
 <script>
     var socket = io.connect('http://localhost:3000');
+
+
+    function submitForm() {
+        
+            alert("Form submitted! This is a static example without backend functionality.");
+        }
 
     socket.on('voterData', function (data) {
         var table = document.getElementById('votersTable');
