@@ -25,8 +25,8 @@ DROP TABLE IF EXISTS `races`;
 CREATE TABLE `races` (
                          `race_title` varchar(150) NOT NULL,
                          `Canidadates` JSON DEFAULT NULL,
-                         `zipcode` int (255) NOT NULL,
-                         FOREIGN KEY (`zipcode`) REFERENCES `precint` (`zipcode`)
+                         `zipcode` int(6) NOT NULL,
+                         FOREIGN KEY (`zipcode`) REFERENCES `precinct` (`zipcode`)
                          
                          PRIMARY KEY (`race_title`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -38,9 +38,9 @@ CREATE TABLE `races` (
 
 LOCK TABLES `races` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `races` VALUES ('voterid1','Password@123','voter','alec@gmail.com'),('voterid2','Password@123','voter','joseph@gmail.com'),('voterid3','Password@123','voter','vedairen@gmail.com');
-
-INSERT INTO `races` VALUES ('voterid4','Password@123','admin','admin@gmail.com');
+INSERT INTO `races` VALUES ('mayorship','{"name": "Candidate 1", "party": "Party A"},
+        {"name": "Candidate 2", "party": "Party B"},
+        {"name": "Candidate 3", "party": "Party C"}','voter','alec@gmail.com');
 
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 

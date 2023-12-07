@@ -23,7 +23,8 @@ DROP TABLE IF EXISTS `precinct`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `precinct` (
-                            `zipcode` int (255) NOT NULL,
+                            `zipcode` int (6) NOT NULL,
+                            'last_4_Digits' int (4) NOT NULL,
                             `voting_location` varchar(100) NOT NULL,
                             `polling_manager` varchar(150) NOT NULL,
                             `state_election_contact` varchar(255) NOT NULL,
@@ -39,7 +40,6 @@ CREATE TABLE `precinct` (
 LOCK TABLES `precinct` WRITE;
 /*!40000 ALTER TABLE `voters` DISABLE KEYS */;
 INSERT INTO `precinct` VALUES (522401512,'630 S Capital Street, Iowa City','Airen','Seamans Center','Iowa City',52240,24,'DMV12344','pending');
-INSERT INTO `precinct` VALUES ('jbartoszczyk@uiowa.edu','Joseph','Bartoszczyk','Seamans Center','Iowa City',52240,21,'DMV12345','pending');
 /*!40000 ALTER TABLE `voters` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

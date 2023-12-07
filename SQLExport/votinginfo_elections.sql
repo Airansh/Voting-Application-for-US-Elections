@@ -24,10 +24,9 @@ DROP TABLE IF EXISTS `elections`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `elections` (
                             `title` varchar(255) NOT NULL,
-                            `precincts` varchar(100) NOT NULL,
                             `Race` varchar(150) NOT NULL,
-                            `Start Time` varchar(255) NOT NULL,
-                            `End Time` int NOT NULL,
+                            `Start_Time` DATE NOT NULL,
+                            `End_Time` DATE NOT NULL,
                             `status` varchar(45) NOT NULL DEFAULT 'pending',
                             FOREIGN KEY (`Race`) REFERENCES `races` (`race_title`)
                             PRIMARY KEY (`title`)
