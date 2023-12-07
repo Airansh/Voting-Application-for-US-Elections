@@ -37,7 +37,13 @@ function denyVoter(voter_id) {
 }
 document.getElementById('logoutButton').addEventListener('click', function() {
     if(confirm('Are you sure you want to logout?')) {
-        window.location.href = '/Logout';
+        // Emit the 'Logout' event to the server
+        socket.emit('Logout');
+
+        // Redirect to the login page after the session is destroyed
+        socket.on('loggedOut', function() {
+            window.location.href = '/Login';
+        });
     }
 });
 
