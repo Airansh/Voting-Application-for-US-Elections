@@ -16,7 +16,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `voters`
+-- Table structure for table `elections`
 --
 
 DROP TABLE IF EXISTS `elections`;
@@ -28,20 +28,20 @@ CREATE TABLE `elections` (
                             `Start_Time` DATE NOT NULL,
                             `End_Time` DATE NOT NULL,
                             `status` varchar(45) NOT NULL DEFAULT 'pending',
-                            FOREIGN KEY (`Race`) REFERENCES `races` (`race_title`)
+                            FOREIGN KEY (`Race`) REFERENCES `races` (`race_title`),
                             PRIMARY KEY (`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `voters`
+-- Dumping data for table `elections`
 --
 
 LOCK TABLES `elections` WRITE;
-/*!40000 ALTER TABLE `voters` DISABLE KEYS */;
-INSERT INTO `elections` VALUES ('vedairen@gmail.com','Vedansh','Airen','Seamans Center','Iowa City',52240,24,'DMV12344','pending');
-INSERT INTO `elections` VALUES ('jbartoszczyk@uiowa.edu','Joseph','Bartoszczyk','Seamans Center','Iowa City',52240,21,'DMV12345','pending');
-/*!40000 ALTER TABLE `voters` ENABLE KEYS */;
+/*!40000 ALTER TABLE `elections` DISABLE KEYS */;
+/*INSERT INTO `elections` VALUES ('vedairen@gmail.com','Vedansh','Airen','Seamans Center','Iowa City',52240,24,'DMV12344','pending');
+INSERT INTO `elections` VALUES ('jbartoszczyk@uiowa.edu','Joseph','Bartoszczyk','Seamans Center','Iowa City',52240,21,'DMV12345','pending');*/
+/*!40000 ALTER TABLE `elections` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

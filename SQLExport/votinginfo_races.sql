@@ -15,7 +15,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 --
--- Table structure for table `users`
+-- Table structure for table `races`
 
 Use votinginfo;
 --
@@ -25,24 +25,24 @@ DROP TABLE IF EXISTS `races`;
 CREATE TABLE `races` (
                          `race_title` varchar(150) NOT NULL,
                          `Canidadates` JSON DEFAULT NULL,
-                         `zipcode` int(6) NOT NULL,
-                         FOREIGN KEY (`zipcode`) REFERENCES `precinct` (`zipcode`)
+                         `zipcode` int NOT NULL,
+                         FOREIGN KEY (`zipcode`) REFERENCES `zipcode` (`precinct`),
                          
-                         PRIMARY KEY (`race_title`),
+                         PRIMARY KEY (`race_title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 --
--- Dumping data for table `users`
+-- Dumping data for table `races`
 --
 
 
 LOCK TABLES `races` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+/*!40000 ALTER TABLE `races` DISABLE KEYS */;
 INSERT INTO `races` VALUES ('mayorship','{"name": "Candidate 1", "party": "Party A"},
         {"name": "Candidate 2", "party": "Party B"},
-        {"name": "Candidate 3", "party": "Party C"}','voter','alec@gmail.com');
+        {"name": "Candidate 3", "party": "Party C"}',52240);
 
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+/*!40000 ALTER TABLE `races` ENABLE KEYS */;
 
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

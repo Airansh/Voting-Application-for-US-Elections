@@ -16,31 +16,31 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `voters`
+-- Table structure for table `precinct`
 --
 
 DROP TABLE IF EXISTS `precinct`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `precinct` (
-                            `zipcode` int (6) NOT NULL,
-                            'last_4_Digits' int (4) NOT NULL,
+                            `zipcode` int NOT NULL,
+                            `last_4_Digits` int NOT NULL,
                             `voting_location` varchar(100) NOT NULL,
                             `polling_manager` varchar(150) NOT NULL,
                             `state_election_contact` varchar(255) NOT NULL,
-                            FOREIGN KEY (`polling_manager`) REFERENCES `users` (`voter_id`)
+                            FOREIGN KEY (`polling_manager`) REFERENCES `users` (`voter_id`),
                             PRIMARY KEY (`zipcode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `voters`
+-- Dumping data for table `precinct`
 --
 
 LOCK TABLES `precinct` WRITE;
-/*!40000 ALTER TABLE `voters` DISABLE KEYS */;
-INSERT INTO `precinct` VALUES (522401512,'630 S Capital Street, Iowa City','Airen','Seamans Center','Iowa City',52240,24,'DMV12344','pending');
-/*!40000 ALTER TABLE `voters` ENABLE KEYS */;
+/*!40000 ALTER TABLE `precinct` DISABLE KEYS */;
+INSERT INTO `precinct` VALUES (52240,1234,'630 S Capital Street, Iowa City','voterid5','Some Guy');
+/*!40000 ALTER TABLE `precinct` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
