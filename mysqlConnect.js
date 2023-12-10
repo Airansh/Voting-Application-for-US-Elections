@@ -60,9 +60,12 @@ app.get('/ForgotPassword',(req,res) =>{
     console.log("ForgotPassword Page");
     res.sendFile('./views/forgotpassword.html',{root: __dirname});
 })
-app.get('/voters', (req, res) => {
-    //old functionality
-});
+app.get('/NewPrecinct',(req,res) =>{
+    console.log("adding new Precinct");
+    res.sendFile('./views/admin.html',{root: __dirname});
+})
+    
+
 io.on('connection', function(socket) {
     //console.log("New Client has connected")
     const sql1 = `SELECT * FROM voters WHERE status='pending'`;
@@ -71,6 +74,36 @@ io.on('connection', function(socket) {
             throw err;
         }
         socket.emit('voterData', results);
+    });
+    socket.on('NewElection', (data)=>{
+
+        const insertSql = 'INSERT INTO  precinct (title, Race, Start_Time, End_Time) VALUES (?, ?, ?, ?)';
+        db.query(insertSql, [data.electionTitle, data.races, data.startTime,data.endTime], (err, result) => {
+            if(err) {
+                throw err;
+            }
+        res.send('Election created successfully!');
+        })
+    });
+    socket.on('NewRace', (data)=>{
+
+        const insertSql = 'INSERT INTO  races (race_title, Canidadates, zipcode) VALUES (?, ?, ?)';
+        db.query(insertSql, [data.raceTitle, data.candidates, data.precinctZipCode], (err, result) => {
+            if(err) {
+                throw err;
+            }
+        res.send('Race created successfully!');
+        })
+    });
+    socket.on('NewPrecinct', (data)=>{
+
+        const insertSql = 'INSERT INTO elections (zipcode, last_4_Digits, voting_location,polling_manager,state_election_contact) VALUES (?, ?, ?, ?, ?)';
+        db.query(insertSql, [data.zipcode, data.last_4_Digits, voting_location,polling_manager,state_election_contact], (err, result) => {
+            if(err) {
+                throw err;
+            }
+        res.send('Precinct created successfully!');
+        })
     });
     socket.on('ForgotPassword', (data)=>{
         const sql = 'SELECT 1 FROM users WHERE email_id = '+"'"+data.email+"' AND voter_id = '" +

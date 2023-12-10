@@ -39,3 +39,36 @@ function denyVoter(voter_id) {
 socket.on('connect', function() {
     console.log('Connected to server');
 });
+
+function NewPrecinct(){
+
+    let zipCode = document.getElementById("electionTitle").value
+    let lastFourDigits = document.getElementById("precincts").value
+    let votingLocation = document.getElementById("races").value
+    let pollingManager = document.getElementById("candidates").value
+    let stateElectionContact = document.getElementById("stateElectionContact").value
+
+    let data = {
+        zipCode : zipCode,
+        lastFourDigits : lastFourDigits,
+        votingLocation : votingLocation,
+        pollingManager : pollingManager,
+        stateElectionContact : stateElectionContact,
+    }
+    socket.emit('NewPrecinct', data);
+}
+function NewElection(){
+
+    let electionTitle = document.getElementById("electionTitle").value
+    let races = document.getElementById("races").value
+    let startTime = document.getElementById("startTime").value
+    let endTime = document.getElementById("endTime").value
+
+    let data = {
+        electionTitle : electionTitle,
+        races : races,
+        startTime : startTime,
+        endTime : endTime
+        }
+    socket.emit('NewElection', data);
+}

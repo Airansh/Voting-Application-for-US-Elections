@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -76,14 +76,8 @@
     <label for="electionTitle">Election Title:</label>
     <input type="text" id="electionTitle" name="electionTitle" required>
 
-    <label for="precincts">Precincts:</label>
-    <input type="text" id="precincts" name="precincts" required>
-
     <label for="races">Races:</label>
     <input type="text" id="races" name="races" required>
-
-    <label for="candidates">Candidates:</label>
-    <input type="text" id="candidates" name="candidates" required>
 
     <label for="startTime">Start Time:</label>
     <input type="datetime-local" id="startTime" name="startTime" required>
@@ -91,18 +85,62 @@
     <label for="endTime">End Time:</label>
     <input type="datetime-local" id="endTime" name="endTime" required>
 
-    <button type="button" onclick="submitForm()">Submit</button>
+    <button type="button" onclick="newElection()">Submit</button>
 </form>
-  
+<form id="precinctForm", action="/submitForm" method="post">
+    <h2>Create New Precinct</h2>
+
+    <label for="zipCode">Zip Code:</label>
+    <input type="text" id="zipCode" name="zipCode" required>
+
+    <label for="lastFourDigits">Last 4 Digits of Zip Code:</label>
+    <input type="text" id="lastFourDigits" name="lastFourDigits" required>
+
+    <label for="votingLocation">Voting Location Address:</label>
+    <input type="text" id="votingLocation" name="votingLocation" required>
+
+    <label for="pollingManager">Polling Manager:</label>
+    <input type="text" id="pollingManager" name="pollingManager" required>
+
+    <label for="stateElectionContact">State Election Contact:</label>
+    <input type="text" id="stateElectionContact" name="stateElectionContact" required>
+
+    <button type="button" onclick="NewPrecinct()">Create Precinct</button>
+</form>
+<form id="raceForm">
+    <h2>Create New Race</h2>
+
+    <label for="raceTitle">Race Title:</label>
+    <input type="text" id="raceTitle" name="raceTitle" required>
+
+    <label for="candidates">Candidates:</label>
+    <div id="candidatesContainer">
+        <div class="candidateEntry">
+            <input type="text" name="candidateName[]" placeholder="Candidate Name" required>
+            <input type="text" name="candidateParty[]" placeholder="Candidate Party" required>
+        </div>
+    </div>
+    <button type="button" onclick="addCandidate()">Add Candidate</button>
+
+    <label for="precinctZipCode">Precinct Zip Code:</label>
+    <input type="text" id="precinctZipCode" name="precinctZipCode" required>
+
+    <button type="button" onclick="NewRace()">Create Race</button>
+</form>
 <script src="/socket.io/socket.io.js"></script>
 <script>
+    function addCandidate() {
+        const candidatesContainer = document.getElementById('candidatesContainer');
+        const newCandidateEntry = document.createElement('div');
+        newCandidateEntry.className = 'candidateEntry';
+        newCandidateEntry.innerHTML = `
+            <input type="text" name="candidateName[]" placeholder="Candidate Name" required>
+            <input type="text" name="candidateParty[]" placeholder="Candidate Party" required>
+        `;
+        candidatesContainer.appendChild(newCandidateEntry);
+    }
     var socket = io.connect('http://localhost:3000');
 
-
-    function submitForm() {
-            
-            alert("Form submitted! This is a static example without backend functionality.");
-        }
 
     socket.on('voterData', function (data) {
         var table = document.getElementById('votersTable');
@@ -131,7 +169,7 @@
             cell10.innerHTML = "<button onclick='denyVoter(\""+voter.email_id+"\")'>Deny</button>";
         });
     });
-
+    var socket = io.connect('http://localhost:3000');
     function approveVoter(email_id) {
         socket.emit('approveVoter', email_id);
     }
@@ -150,6 +188,35 @@
         location.reload();
     });
 
+    function NewRace(){
+        var socket = io.connect('http://localhost:3000');
+        const raceTitle = document.getElementById('raceTitle').value;
+        const precinctZipCode = document.getElementById('precinctZipCode').value;
+
+        const candidateEntries = document.querySelectorAll('.candidateEntry');
+        const candidatesData = [];
+
+        candidateEntries.forEach((entry) => {
+            const candidateName = entry.querySelector('input[name="candidateName[]"]').value;
+            const candidateParty = entry.querySelector('input[name="candidateParty[]"]').value;
+
+            candidatesData.push({
+                name: candidateName,
+                party: candidateParty
+            });
+        });
+
+        // Convert candidatesData to JSON format
+        const candidatesJSON = JSON.stringify(candidatesData);
+
+        const formData = {
+            raceTitle: raceTitle,
+            precinctZipCode: precinctZipCode,
+            candidates: candidatesJSON
+        };
+        console.log(formData);
+        socket.emit('NewRace', formData);
+}
 </script>
 </body>
 </html>
