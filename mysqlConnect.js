@@ -7,8 +7,19 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const port = 3000;
+const session = require('express-session');
+
 app.use('/public', express.static('public'));
 // Create connection
+
+const sessionMiddleware = session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // set to true if your website uses https
+  });
+app.use(sessionMiddleware);
+
 const db = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -24,8 +35,23 @@ db.connect((err) => {
     }
     console.log('MySQL Connected...');
 });
-app.get('/Admin', (req, res) => {
-    res.sendFile('./views/admin.html', {root: __dirname});
+app.get('/CreatePassword',(req,res) =>{
+    console.log("Create Password Page");
+    res.sendFile('./views/createPassword.html',{root: __dirname});
+});
+app.get('/Voter', (req, res) => {
+    if (req.session.role === 'voter') {
+        res.sendFile('./views/voter.html', {root: __dirname});
+    } else {
+        res.status(403).send('Unauthorized');
+    }
+});
+app.get('/Admin', (req, res, next) => {
+    if (req.session.role === 'admin' || req.session.role === 'manager') {
+        res.sendFile('./views/admin.html', {root: __dirname});
+    } else {
+        res.status(403).send('Unauthorized');
+    }
 });
 app.get('/', (req, res) => {
     console.log('Connected to MySQL Database');
@@ -33,6 +59,10 @@ app.get('/', (req, res) => {
 });
 app.get('/Login',(req,res) =>{
     console.log("Login Page");
+    res.sendFile('./views/login.html',{root: __dirname});
+})
+app.get('/Logout',(req,res) =>{
+    console.log("Logged Out");
     res.sendFile('./views/login.html',{root: __dirname});
 })
 app.get('/RequestAccount',(req,res) =>{
@@ -46,10 +76,16 @@ app.get('/ForgotPassword',(req,res) =>{
 app.get('/voters', (req, res) => {
     //old functionality
 });
-app.get('/CreatePassword',(req,res) =>{
-    console.log("Create Password Page");
-    res.sendFile('./views/createPassword.html',{root: __dirname});
+app.get('/ChangeDetails', (req, res) => {
+    if (req.session.userId) {
+        res.sendFile('./views/changeDetails.html', {root: __dirname});
+    } else {
+        res.status(403).send('Unauthorized');
+    }
 });
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, {}, next);
+  });
 io.on('connection', function(socket) {
     //console.log("New Client has connected")
     const sql1 = `SELECT * FROM voters WHERE status='pending'`;
@@ -59,6 +95,66 @@ io.on('connection', function(socket) {
         }
         socket.emit('voterData', results);
     });
+    socket.on('ForgotPassword', (data)=>{
+        const sql = 'SELECT 1 FROM users WHERE email_id = '+"'"+data.email+"' AND voter_id = '" +
+            data.voterID+"' ORDER BY email_id LIMIT 1"
+        db.query(sql, (err, results) => {
+            if (err) {
+                throw err;
+            }
+            if (results.length > 0) {
+                let data1 = {
+                    valid: "1"
+                }
+
+                let transporter1 = nodemailer.createTransport({
+                    host: 'smtp.zoho.com',
+                    port: 465,
+                    secure: true, //ssl
+                    auth: {
+                        user:'vedtest5@yahoo.com',
+                        pass:'Testing@1'
+                    }
+                });
+                let mailOptions1 = {
+                    from: 'vedtest5@yahoo.com', // sender address
+                    to: data.email, // list of receivers
+                    subject: 'Dear Voter, Please Generate Password', // Subject line
+                    text: `Please generate a new password using the following link: http://localhost:3000/CreatePassword` // plain text body
+                };
+
+                transporter1.sendMail(mailOptions1, (error, info) => {
+                    if (error) {
+                        console.log('Error sending email:', error);
+                    } else {
+                        console.log('Email sent:', info.response);
+                    }
+                });
+                socket.emit('validationForgotPassword',data1)
+            }else{
+                let data2= {
+                    valid : "0"
+                }
+                socket.emit('validationForgotPassword',data2)
+            }
+        })
+    })
+    socket.on('searchVoter',(data)=>{
+        let sql = ""
+        if(data.criteria === "name"){
+            sql = "SELECT * FROM voters WHERE first_name = '"+data.value+"'";
+        }else if(data.criteria ==="zipcode"){
+            sql = "SELECT * FROM voters WHERE Zipcode = '"+data.value+"'";
+        }
+        if(sql !== ""){
+            db.query(sql,(err, results) => {
+                if(err){
+                    throw err;
+                }
+                socket.emit('searchResults',results);
+            })
+        }
+    })
     socket.on('approveVoter', (email_id) => {
         const updateSql = 'UPDATE voters SET status = ? WHERE email_id = ?';
         db.query(updateSql, ['approved', email_id], (err, result) => {
@@ -158,6 +254,17 @@ io.on('connection', function(socket) {
             socket.join('requestPage')
         }
     });
+    socket.on('Logout', () => {
+        // Destroy the session
+        socket.request.session.destroy(err => {
+            if (err) {
+                console.log('Error destroying session:', err);
+            } else {
+                console.log('Session destroyed');
+                socket.emit('loggedOut');
+            }
+        });
+    });
     socket.on('request',(data)=>{
         console.log('Request Recieved:');
         console.log(data);
@@ -192,6 +299,42 @@ io.on('connection', function(socket) {
         });
 
     })
+    socket.on('login',(data)=>{
+        const { voterId, password } = data;
+        const selectSql = 'SELECT * FROM users WHERE voter_id = ? AND password = ?';
+        db.query(selectSql, [voterId,password], (err, results) => {
+            if(err) {
+                throw err;
+            }
+            if(results.length > 0) {
+                let tempData = {
+                    user : voterId,
+                    role : results[0].role
+                }
+                console.log("successful login")
+                socket.emit('loginSuccess',tempData);
+    
+                // Set the session id to the voter id
+                socket.request.session.userId = voterId;
+                // Store the user's role in the session
+                socket.request.session.role = results[0].role;
+                socket.request.session.email_id = results[0].email_id;
+                // Save the session before emitting the event
+                socket.request.session.save(err => {
+                    if (err) {
+                        console.log('Error saving session:', err);
+                    } else {
+                        console.log(socket.request.session);
+                        socket.emit('sessionSaved');
+                    }
+                });
+
+            } else {
+                console.log("failed login")
+                socket.emit('loginFailed');
+            }
+        });
+    })
     socket.on('createPassword', (data) => {
         const { voterId, password } = data;
         const selectSql = 'SELECT * FROM users WHERE voter_id = ? AND password IS NULL';
@@ -213,9 +356,21 @@ io.on('connection', function(socket) {
                 socket.emit('passwordUpdateFailed');
             }
         });
-    });
+    })
+    socket.on('changeDetails', (data) => {
+        const { address, city, zipcode } = data;
+        const email_id = socket.request.session.email_id;
+        const updateSql = 'UPDATE voters SET address = ?, city = ?, zipcode = ? WHERE email_id = ?';
+        db.query(updateSql, [address, city, zipcode, email_id], (err, result) => {
+            if(err) {
+                throw err;
+            }
+            console.log('Voter details updated');
+            socket.emit('detailsChanged');
+        });
+    })
 
-// ... existing code ...
+
 });
 
 server.listen(port, () => {

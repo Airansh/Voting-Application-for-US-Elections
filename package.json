@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "io": "^1.5.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.6.3",
@@ -23,6 +24,5 @@
   },
   "directories": {
     "lib": "lib"
-  },
-  "devDependencies": {}
+  }
 }

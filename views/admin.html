@@ -6,10 +6,16 @@
         table, th, td {
             border: 1px solid black;
         }
+        #logoutButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
     </style>
 </head>
 <body>
 <h1>Admin Panel</h1>
+<button id="logoutButton">Logout</button>
 <table id="votersTable">
     <tr>
         <th>Email ID</th>
@@ -25,49 +31,33 @@
     </tr>
 </table>
 <script src="/socket.io/socket.io.js"></script>
-<script>
-    var socket = io.connect('http://localhost:3000');
-
-    socket.on('voterData', function (data) {
-        var table = document.getElementById('votersTable');
-        data.forEach(function(voter) {
-            var row = table.insertRow(-1);
-            var cell1 = row.insertCell(0);
-            var cell2 = row.insertCell(1);
-            var cell3 = row.insertCell(2);
-            var cell4 = row.insertCell(3);
-            var cell5 = row.insertCell(4);
-            var cell6 = row.insertCell(5);
-            var cell7 = row.insertCell(6);
-            var cell8 = row.insertCell(7);
-            var cell9 = row.insertCell(8);
-            var cell10 = row.insertCell(9);
-
-            cell1.innerHTML = voter.email_id;
-            cell2.innerHTML = voter.first_name;
-            cell3.innerHTML = voter.last_name;
-            cell4.innerHTML = voter.address;
-            cell5.innerHTML = voter.city;
-            cell6.innerHTML = voter.zipcode;
-            cell7.innerHTML = voter.age;
-            cell8.innerHTML = voter.driving_license;
-            cell9.innerHTML = "<button onclick='approveVoter(\""+voter.email_id+"\")'>Approve</button>";
-            cell10.innerHTML = "<button onclick='denyVoter(\""+voter.email_id+"\")'>Deny</button>";
-        });
-    });
-
-    function approveVoter(email_id) {
-        socket.emit('approveVoter', email_id);
-    }
-
-    function denyVoter(email_id) {
-        socket.emit('denyVoter', email_id);
-    }
-
-    socket.on('voterStatusUpdated', function() {
-        location.reload();
-    });
-
-</script>
+<form id="searchForm">
+    <label for="searchCriteria">Select Search Criteria:</label>
+    <select id="searchCriteria">
+        <option value="name">Name</option>
+        <option value="zipcode">Zip Code</option>
+        <!-- Add more options for other search criteria -->
+    </select>
+    <br>
+    <label for="searchValue">Enter Search Value:</label>
+    <input type="text" id="searchValue" name="searchValue">
+    <br>
+    <button type="submit">Submit</button>
+    <script src="../public/static/admin.js"></script>
+</form>
+<table id="searchTable">
+    <tr>
+        <th>Email ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>Zipcode</th>
+        <th>Age</th>
+        <th>Driving License</th>
+        <th>Approve</th>
+        <th>Deny</th>
+    </tr>
+</table>
 </body>
 </html>
