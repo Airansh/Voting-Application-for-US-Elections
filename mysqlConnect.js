@@ -106,7 +106,7 @@ io.on('connection', function(socket) {
     socket.on('NewPrecinct', (data)=>{
 
         const insertSql = 'INSERT INTO precinct (zipcode, last_4_Digits, voting_location,polling_manager,state_election_contact) VALUES (?, ?, ?, ?, ?)';
-        db.query(insertSql, [data.zipcode, data.last_4_Digits, voting_location,polling_manager,state_election_contact], (err, result) => {
+        db.query(insertSql, [data.zipCode, data.lastFourDigits, data.votingLocation,data.pollingManager,data.stateElectionContact], (err, result) => {
             if(err) {
                 throw err;
             }

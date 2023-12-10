@@ -23,8 +23,8 @@ DROP TABLE IF EXISTS `precinct`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `precinct` (
-                            `zipcode` int NOT NULL,
-                            `last_4_Digits` int NOT NULL,
+                            `zipcode` varchar NOT NULL,
+                            `last_4_Digits` varchar NOT NULL,
                             `voting_location` varchar(100) NOT NULL,
                             `polling_manager` varchar(150) NOT NULL,
                             `state_election_contact` varchar(255) NOT NULL,

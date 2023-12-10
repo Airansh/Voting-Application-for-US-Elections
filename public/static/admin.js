@@ -43,10 +43,10 @@ socket.on('connect', function() {
 
 function NewPrecinct(){
 
-    let zipCode = document.getElementById("electionTitle").value
-    let lastFourDigits = document.getElementById("precincts").value
-    let votingLocation = document.getElementById("races").value
-    let pollingManager = document.getElementById("candidates").value
+    let zipCode = document.getElementById("zipCode").value
+    let lastFourDigits = document.getElementById("lastFourDigits").value
+    let votingLocation = document.getElementById("votingLocation").value
+    let pollingManager = document.getElementById("pollingManager").value
     let stateElectionContact = document.getElementById("stateElectionContact").value
 
     let data = {
@@ -56,6 +56,7 @@ function NewPrecinct(){
         pollingManager : pollingManager,
         stateElectionContact : stateElectionContact,
     }
+    console.log(data);
     socket.emit('NewPrecinct', data);
 }
 function NewElection(){
