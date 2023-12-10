@@ -10,6 +10,7 @@ const port = 3000;
 const session = require('express-session');
 
 app.use('/public', express.static('public'));
+
 // Create connection
 
 const sessionMiddleware = session({
@@ -23,8 +24,8 @@ app.use(sessionMiddleware);
 const db = mysql.createConnection({
     host: 'localhost',
     port: 3306,
-    user: 'vedansh',
-    password: 'password',
+    user: 'root',
+    password: 'j3@s9rhTbt4Be4wZ',
     database: 'votinginfo'
 });
 
@@ -72,20 +73,21 @@ app.get('/RequestAccount',(req,res) =>{
 app.get('/ForgotPassword',(req,res) =>{
     console.log("ForgotPassword Page");
     res.sendFile('./views/forgotpassword.html',{root: __dirname});
+})/*
+app.get('/NewPrecinct',(req,res) =>{
+    console.log("adding new Precinct");
+    res.sendFile('./views/admin.html',{root: __dirname});
 })
-app.get('/voters', (req, res) => {
-    //old functionality
-});
-app.get('/ChangeDetails', (req, res) => {
-    if (req.session.userId) {
-        res.sendFile('./views/changeDetails.html', {root: __dirname});
-    } else {
-        res.status(403).send('Unauthorized');
-    }
-});
-io.use((socket, next) => {
-    sessionMiddleware(socket.request, {}, next);
-  });
+app.get('/NewRace',(req,res) =>{
+    console.log("adding new Race");
+    res.sendFile('./views/admin.html',{root: __dirname});
+})
+app.get('/NewElection',(req,res) =>{
+    console.log("adding new Election");
+    res.sendFile('./views/admin.html',{root: __dirname});
+})
+    */
+
 io.on('connection', function(socket) {
     //console.log("New Client has connected")
     const sql1 = `SELECT * FROM voters WHERE status='pending'`;
@@ -94,6 +96,33 @@ io.on('connection', function(socket) {
             throw err;
         }
         socket.emit('voterData', results);
+    });
+    socket.on('NewElection', (data)=>{
+
+        const insertSql = 'INSERT INTO  elections (title, Race, Start_Time, End_Time) VALUES (?, ?, ?, ?)';
+        db.query(insertSql, [data.electionTitle, data.races, data.startTime,data.endTime], (err, result) => {
+            if(err) {
+                throw err;
+            }
+        })
+    });
+    socket.on('NewRace', (data)=>{
+
+        const insertSql = 'INSERT INTO  races (race_title, Canidadates, zipcode) VALUES (?, ?, ?)';
+        db.query(insertSql, [data.raceTitle, data.candidates, data.precinctZipCode], (err, result) => {
+            if(err) {
+                throw err;
+            }
+        })
+    });
+    socket.on('NewPrecinct', (data)=>{
+
+        const insertSql = 'INSERT INTO precinct (zipcode, last_4_Digits, voting_location,polling_manager,state_election_contact) VALUES (?, ?, ?, ?, ?)';
+        db.query(insertSql, [data.zipCode, data.lastFourDigits, data.votingLocation,data.pollingManager,data.stateElectionContact], (err, result) => {
+            if(err) {
+                throw err;
+            }
+        })
     });
     socket.on('ForgotPassword', (data)=>{
         const sql = 'SELECT 1 FROM users WHERE email_id = '+"'"+data.email+"' AND voter_id = '" +

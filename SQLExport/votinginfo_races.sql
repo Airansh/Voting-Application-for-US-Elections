@@ -15,35 +15,33 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 --
--- Table structure for table `users`
+-- Table structure for table `races`
 
 Use votinginfo;
 --
-DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `races`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
-                         `voter_id` varchar(150) NOT NULL,
-                         `password` varchar(150) DEFAULT NULL,
-                         `role` varchar(50) NOT NULL DEFAULT 'voter',
-                         `email_id` varchar(255) NOT NULL,
-                         PRIMARY KEY (`voter_id`),
-                         KEY `email_id_foreign_idx` (`email_id`),
-                         CONSTRAINT `email_id_foreign` FOREIGN KEY (`email_id`) REFERENCES `voters` (`email_id`)
+CREATE TABLE `races` (
+                         `race_title` varchar(150) NOT NULL,
+                         `Canidadates` JSON DEFAULT NULL,
+                         `zipcode` int NOT NULL,
+                         
+                         PRIMARY KEY (`race_title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 --
--- Dumping data for table `users`
+-- Dumping data for table `races`
 --
 
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('voterid1','Password@123','voter','alec@gmail.com'),('voterid2','Password@123','voter','joseph@gmail.com'),('voterid3','Password@123','voter','vedairen@gmail.com');
+LOCK TABLES `races` WRITE;
+/*!40000 ALTER TABLE `races` DISABLE KEYS */;
+INSERT INTO `races` VALUES ('mayorship','{"name": "Candidate 1", "party": "Party A"},
+        {"name": "Candidate 2", "party": "Party B"},
+        {"name": "Candidate 3", "party": "Party C"}',52240);
 
-INSERT INTO `users` VALUES ('voterid4','Password@123','admin','admin@gmail.com');
-INSERT INTO `users` VALUES ('voterid5','Password@123','manager','manager@gmail.com');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+/*!40000 ALTER TABLE `races` ENABLE KEYS */;
 
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

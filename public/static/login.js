@@ -13,7 +13,10 @@ socket.on('loginSuccess',(data)=> {
     console.log(data.role)
     if(data.role == "admin"){
         console.log("help")
-        location.href = 'http://localhost:3000/admin'
+        location.href = 'http://localhost:3000/admin'}
+    else if(data.role == "manager"){
+        console.log("help")
+        location.href = 'http://localhost:3000/manager'
     }else if(data.role === "voter"){
         location.replace('https://localhost/voter');
     }

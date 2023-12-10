@@ -1,6 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<script src="/socket.io/socket.io.js"></script>
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <style>
         table, th, td {
@@ -11,6 +15,43 @@
             top: 10px;
             right: 10px;
         }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+        
     </style>
 </head>
 <body>
@@ -30,7 +71,6 @@
         <th>Deny</th>
     </tr>
 </table>
-<script src="/socket.io/socket.io.js"></script>
 <form id="searchForm">
     <label for="searchCriteria">Select Search Criteria:</label>
     <select id="searchCriteria">
@@ -59,5 +99,124 @@
         <th>Deny</th>
     </tr>
 </table>
+<form id="electionForm">
+    <h2>Election Setup</h2>
+
+    <label for="electionTitle">Election Title:</label>
+    <input type="text" id="electionTitle" name="electionTitle" required>
+
+    <label for="races">Races:</label>
+    <input type="text" id="races" name="races" required>
+
+    <label for="startTime">Start Time:</label>
+    <input type="datetime-local" id="startTime" name="startTime" required>
+
+    <label for="endTime">End Time:</label>
+    <input type="datetime-local" id="endTime" name="endTime" required>
+
+    <button type="button" onclick="NewElection()">Submit</button>
+</form>
+<form id="precinctForm", action="/submitForm" method="post">
+    <h2>Create New Precinct</h2>
+
+    <label for="zipCode">Zip Code:</label>
+    <input type="text" id="zipCode" name="zipCode" required>
+
+    <label for="lastFourDigits">Last 4 Digits of Zip Code:</label>
+    <input type="text" id="lastFourDigits" name="lastFourDigits" required>
+
+    <label for="votingLocation">Voting Location Address:</label>
+    <input type="text" id="votingLocation" name="votingLocation" required>
+
+    <label for="pollingManager">Polling Manager:</label>
+    <input type="text" id="pollingManager" name="pollingManager" required>
+
+    <label for="stateElectionContact">State Election Contact:</label>
+    <input type="text" id="stateElectionContact" name="stateElectionContact" required>
+
+    <button type="button" onclick="NewPrecinct()">Create Precinct</button>
+</form>
+<form id="raceForm">
+    <h2>Create New Race</h2>
+
+    <label for="raceTitle">Race Title:</label>
+    <input type="text" id="raceTitle" name="raceTitle" required>
+
+    <label for="candidates">Candidates:</label>
+    <div id="candidatesContainer">
+        <div class="candidateEntry">
+            <input type="text" name="candidateName[]" placeholder="Candidate Name" required>
+            <input type="text" name="candidateParty[]" placeholder="Candidate Party" required>
+        </div>
+    </div>
+    <button type="button" onclick="addCandidate()">Add Candidate</button>
+
+    <label for="precinctZipCode">Precinct Zip Code:</label>
+    <input type="text" id="precinctZipCode" name="precinctZipCode" required>
+
+    <button type="button" onclick="NewRace()">Create Race</button>
+</form>
+<script src="../public/static/admin.js"></script>
+<script>
+    function addCandidate() {
+        const candidatesContainer = document.getElementById('candidatesContainer');
+        const newCandidateEntry = document.createElement('div');
+        newCandidateEntry.className = 'candidateEntry';
+        newCandidateEntry.innerHTML = `
+            <input type="text" name="candidateName[]" placeholder="Candidate Name" required>
+            <input type="text" name="candidateParty[]" placeholder="Candidate Party" required>
+        `;
+        candidatesContainer.appendChild(newCandidateEntry);
+    }
+    var socket = io.connect('http://localhost:3000');
+
+
+    socket.on('voterData', function (data) {
+        var table = document.getElementById('votersTable');
+        data.forEach(function(voter) {
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+            var cell5 = row.insertCell(4);
+            var cell6 = row.insertCell(5);
+            var cell7 = row.insertCell(6);
+            var cell8 = row.insertCell(7);
+            var cell9 = row.insertCell(8);
+            var cell10 = row.insertCell(9);
+
+            cell1.innerHTML = voter.email_id;
+            cell2.innerHTML = voter.first_name;
+            cell3.innerHTML = voter.last_name;
+            cell4.innerHTML = voter.address;
+            cell5.innerHTML = voter.city;
+            cell6.innerHTML = voter.zipcode;
+            cell7.innerHTML = voter.age;
+            cell8.innerHTML = voter.driving_license;
+            cell9.innerHTML = "<button onclick='approveVoter(\""+voter.email_id+"\")'>Approve</button>";
+            cell10.innerHTML = "<button onclick='denyVoter(\""+voter.email_id+"\")'>Deny</button>";
+        });
+    });
+    //var socket = io.connect('http://localhost:3000');
+    function approveVoter(email_id) {
+        socket.emit('approveVoter', email_id);
+    }
+
+    function denyVoter(email_id) {
+        socket.emit('denyVoter', email_id);
+    }
+
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        if(confirm('Are you sure you want to logout?')) {
+            window.location.href = '/Logout';
+        }
+    });
+
+    socket.on('voterStatusUpdated', function() {
+        location.reload();
+    });
+
+</script>
 </body>
 </html>

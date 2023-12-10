@@ -1,3 +1,4 @@
+
 var socket = io.connect('http://localhost:3000');
 
 socket.on('voterData', function (data) {
@@ -96,3 +97,65 @@ socket.on('searchResults',function (data){
 socket.on('connect', function() {
     console.log('Connected to server');
 });
+
+function NewPrecinct(){
+
+    let zipCode = document.getElementById("zipCode").value
+    let lastFourDigits = document.getElementById("lastFourDigits").value
+    let votingLocation = document.getElementById("votingLocation").value
+    let pollingManager = document.getElementById("pollingManager").value
+    let stateElectionContact = document.getElementById("stateElectionContact").value
+
+    let data = {
+        zipCode : zipCode,
+        lastFourDigits : lastFourDigits,
+        votingLocation : votingLocation,
+        pollingManager : pollingManager,
+        stateElectionContact : stateElectionContact,
+    }
+    console.log(data);
+    socket.emit('NewPrecinct', data);
+}
+function NewElection(){
+
+    let electionTitle = document.getElementById("electionTitle").value
+    let races = document.getElementById("races").value
+    let startTime = document.getElementById("startTime").value
+    let endTime = document.getElementById("endTime").value
+
+    let data = {
+        electionTitle : electionTitle,
+        races : races,
+        startTime : startTime,
+        endTime : endTime
+        }
+    socket.emit('NewElection', data);
+}
+function NewRace(){
+    const raceTitle = document.getElementById('raceTitle').value;
+    const precinctZipCode = document.getElementById('precinctZipCode').value;
+
+    const candidateEntries = document.querySelectorAll('.candidateEntry');
+    const candidatesData = [];
+
+    candidateEntries.forEach((entry) => {
+        const candidateName = entry.querySelector('input[name="candidateName[]"]').value;
+        const candidateParty = entry.querySelector('input[name="candidateParty[]"]').value;
+
+        candidatesData.push({
+            name: candidateName,
+            party: candidateParty
+        });
+    });
+
+    // Convert candidatesData to JSON format
+    const candidatesJSON = JSON.stringify(candidatesData);
+
+    const formData = {
+        raceTitle: raceTitle,
+        precinctZipCode: precinctZipCode,
+        candidates: candidatesJSON
+    };
+    console.log(formData);
+    socket.emit('NewRace', formData);
+}
