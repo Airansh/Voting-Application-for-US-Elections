@@ -64,6 +64,14 @@ app.get('/NewPrecinct',(req,res) =>{
     console.log("adding new Precinct");
     res.sendFile('./views/admin.html',{root: __dirname});
 })
+app.get('/NewRace',(req,res) =>{
+    console.log("adding new Race");
+    res.sendFile('./views/admin.html',{root: __dirname});
+})
+app.get('/NewElection',(req,res) =>{
+    console.log("adding new Election");
+    res.sendFile('./views/admin.html',{root: __dirname});
+})
     
 
 io.on('connection', function(socket) {
@@ -77,7 +85,7 @@ io.on('connection', function(socket) {
     });
     socket.on('NewElection', (data)=>{
 
-        const insertSql = 'INSERT INTO  precinct (title, Race, Start_Time, End_Time) VALUES (?, ?, ?, ?)';
+        const insertSql = 'INSERT INTO  elections (title, Race, Start_Time, End_Time) VALUES (?, ?, ?, ?)';
         db.query(insertSql, [data.electionTitle, data.races, data.startTime,data.endTime], (err, result) => {
             if(err) {
                 throw err;
@@ -97,7 +105,7 @@ io.on('connection', function(socket) {
     });
     socket.on('NewPrecinct', (data)=>{
 
-        const insertSql = 'INSERT INTO elections (zipcode, last_4_Digits, voting_location,polling_manager,state_election_contact) VALUES (?, ?, ?, ?, ?)';
+        const insertSql = 'INSERT INTO precinct (zipcode, last_4_Digits, voting_location,polling_manager,state_election_contact) VALUES (?, ?, ?, ?, ?)';
         db.query(insertSql, [data.zipcode, data.last_4_Digits, voting_location,polling_manager,state_election_contact], (err, result) => {
             if(err) {
                 throw err;

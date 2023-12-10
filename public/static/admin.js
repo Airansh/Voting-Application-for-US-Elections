@@ -1,3 +1,4 @@
+
 var socket = io.connect('http://localhost:3000');
 
 socket.on('voterData', function (data) {
@@ -71,4 +72,32 @@ function NewElection(){
         endTime : endTime
         }
     socket.emit('NewElection', data);
+}
+function NewRace(){
+    const raceTitle = document.getElementById('raceTitle').value;
+    const precinctZipCode = document.getElementById('precinctZipCode').value;
+
+    const candidateEntries = document.querySelectorAll('.candidateEntry');
+    const candidatesData = [];
+
+    candidateEntries.forEach((entry) => {
+        const candidateName = entry.querySelector('input[name="candidateName[]"]').value;
+        const candidateParty = entry.querySelector('input[name="candidateParty[]"]').value;
+
+        candidatesData.push({
+            name: candidateName,
+            party: candidateParty
+        });
+    });
+
+    // Convert candidatesData to JSON format
+    const candidatesJSON = JSON.stringify(candidatesData);
+
+    const formData = {
+        raceTitle: raceTitle,
+        precinctZipCode: precinctZipCode,
+        candidates: candidatesJSON
+    };
+    console.log(formData);
+    socket.emit('NewRace', formData);
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<script src="/socket.io/socket.io.js"></script>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -127,7 +128,7 @@
 
     <button type="button" onclick="NewRace()">Create Race</button>
 </form>
-<script src="/socket.io/socket.io.js"></script>
+<script src="../public/static/admin.js"></script>
 <script>
     function addCandidate() {
         const candidatesContainer = document.getElementById('candidatesContainer');
@@ -169,7 +170,7 @@
             cell10.innerHTML = "<button onclick='denyVoter(\""+voter.email_id+"\")'>Deny</button>";
         });
     });
-    var socket = io.connect('http://localhost:3000');
+    //var socket = io.connect('http://localhost:3000');
     function approveVoter(email_id) {
         socket.emit('approveVoter', email_id);
     }
@@ -188,35 +189,6 @@
         location.reload();
     });
 
-    function NewRace(){
-        var socket = io.connect('http://localhost:3000');
-        const raceTitle = document.getElementById('raceTitle').value;
-        const precinctZipCode = document.getElementById('precinctZipCode').value;
-
-        const candidateEntries = document.querySelectorAll('.candidateEntry');
-        const candidatesData = [];
-
-        candidateEntries.forEach((entry) => {
-            const candidateName = entry.querySelector('input[name="candidateName[]"]').value;
-            const candidateParty = entry.querySelector('input[name="candidateParty[]"]').value;
-
-            candidatesData.push({
-                name: candidateName,
-                party: candidateParty
-            });
-        });
-
-        // Convert candidatesData to JSON format
-        const candidatesJSON = JSON.stringify(candidatesData);
-
-        const formData = {
-            raceTitle: raceTitle,
-            precinctZipCode: precinctZipCode,
-            candidates: candidatesJSON
-        };
-        console.log(formData);
-        socket.emit('NewRace', formData);
-}
 </script>
 </body>
 </html>
