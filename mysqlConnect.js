@@ -8,6 +8,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const port = 3000;
 app.use('/public', express.static('public'));
+
 // Create connection
 const db = mysql.createConnection({
     host: 'localhost',
@@ -59,7 +60,7 @@ app.get('/RequestAccount',(req,res) =>{
 app.get('/ForgotPassword',(req,res) =>{
     console.log("ForgotPassword Page");
     res.sendFile('./views/forgotpassword.html',{root: __dirname});
-})
+})/*
 app.get('/NewPrecinct',(req,res) =>{
     console.log("adding new Precinct");
     res.sendFile('./views/admin.html',{root: __dirname});
@@ -72,7 +73,7 @@ app.get('/NewElection',(req,res) =>{
     console.log("adding new Election");
     res.sendFile('./views/admin.html',{root: __dirname});
 })
-    
+    */
 
 io.on('connection', function(socket) {
     //console.log("New Client has connected")
@@ -90,7 +91,6 @@ io.on('connection', function(socket) {
             if(err) {
                 throw err;
             }
-        res.send('Election created successfully!');
         })
     });
     socket.on('NewRace', (data)=>{
@@ -100,7 +100,6 @@ io.on('connection', function(socket) {
             if(err) {
                 throw err;
             }
-        res.send('Race created successfully!');
         })
     });
     socket.on('NewPrecinct', (data)=>{
@@ -110,7 +109,6 @@ io.on('connection', function(socket) {
             if(err) {
                 throw err;
             }
-        res.send('Precinct created successfully!');
         })
     });
     socket.on('ForgotPassword', (data)=>{

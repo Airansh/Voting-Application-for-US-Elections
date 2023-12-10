@@ -26,7 +26,6 @@ CREATE TABLE `races` (
                          `race_title` varchar(150) NOT NULL,
                          `Canidadates` JSON DEFAULT NULL,
                          `zipcode` int NOT NULL,
-                         FOREIGN KEY (`zipcode`) REFERENCES `zipcode` (`precinct`),
                          
                          PRIMARY KEY (`race_title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

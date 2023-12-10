@@ -28,7 +28,6 @@ CREATE TABLE `elections` (
                             `Start_Time` DATE NOT NULL,
                             `End_Time` DATE NOT NULL,
                             `status` varchar(45) NOT NULL DEFAULT 'pending',
-                            FOREIGN KEY (`Race`) REFERENCES `races` (`race_title`),
                             PRIMARY KEY (`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

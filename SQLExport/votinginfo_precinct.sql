@@ -23,12 +23,11 @@ DROP TABLE IF EXISTS `precinct`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `precinct` (
-                            `zipcode` varchar NOT NULL,
-                            `last_4_Digits` varchar NOT NULL,
+                            `zipcode` varchar(100) NOT NULL,
+                            `last_4_Digits` varchar(100) NOT NULL,
                             `voting_location` varchar(100) NOT NULL,
                             `polling_manager` varchar(150) NOT NULL,
                             `state_election_contact` varchar(255) NOT NULL,
-                            FOREIGN KEY (`polling_manager`) REFERENCES `users` (`voter_id`),
                             PRIMARY KEY (`zipcode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
