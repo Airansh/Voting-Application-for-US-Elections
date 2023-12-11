@@ -24,8 +24,8 @@ app.use(sessionMiddleware);
 const db = mysql.createConnection({
     host: 'localhost',
     port: 3306,
-    user: 'root',
-    password: 'j3@s9rhTbt4Be4wZ',
+    user: 'vedansh',
+    password: 'password',
     database: 'votinginfo'
 });
 
@@ -35,6 +35,13 @@ db.connect((err) => {
         throw err;
     }
     console.log('MySQL Connected...');
+});
+app.get('/ChangeDetails', (req, res) => {
+    if (req.session.userId) {
+        res.sendFile('./views/changeDetails.html', {root: __dirname});
+    } else {
+        res.status(403).send('Unauthorized');
+    }
 });
 app.get('/CreatePassword',(req,res) =>{
     console.log("Create Password Page");
@@ -87,6 +94,9 @@ app.get('/NewElection',(req,res) =>{
     res.sendFile('./views/admin.html',{root: __dirname});
 })
     */
+io.use((socket, next) => {
+    sessionMiddleware(socket.request, {}, next);
+  });
 
 io.on('connection', function(socket) {
     //console.log("New Client has connected")
