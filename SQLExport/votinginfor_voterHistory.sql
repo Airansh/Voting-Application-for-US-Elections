@@ -34,9 +34,7 @@ CREATE TABLE `voter-history` (
 
 
 LOCK TABLES `voter-history` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
 
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
