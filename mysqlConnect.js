@@ -97,9 +97,96 @@ app.get('/NewElection',(req,res) =>{
 io.use((socket, next) => {
     sessionMiddleware(socket.request, {}, next);
   });
+function queryDatabase(query, parameters) {
+    return new Promise((resolve, reject) => {
+        db.query(query, parameters, (err, results) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
+async function checkEligibility(socket, electionRace) {
+    try {
+        const voterID = socket.request.session.userId;
+        console.log(voterID);
 
+        // First query
+        const findEmail = 'SELECT * FROM users WHERE voter_id = ?';
+        const userResults = await queryDatabase(findEmail, [voterID]);
+        console.log(userResults);
+
+        if (userResults.length === 0) {
+            throw new Error('User not found');
+        }
+
+        // Second query
+        const findZip = 'SELECT * FROM voters WHERE email_id = ?';
+        const voterResults = await queryDatabase(findZip, [userResults[0].email_id]);
+        console.log(voterResults);
+
+        if (voterResults.length === 0) {
+            throw new Error('Voter not found');
+        }
+
+        const zip = voterResults[0].zipcode;
+
+        // Third query
+        const sql3 = 'SELECT * FROM races WHERE race_title = ?';
+        const raceResults = await queryDatabase(sql3, [electionRace]);
+        console.log(electionRace);
+        const eligible = raceResults.length > 0 && raceResults[0].zipcode === zip;
+        console.log(raceResults, zip, eligible);
+        let returnContent = {
+            eligible:eligible,
+            candidates:raceResults[0].Canidadates,
+            race_title:raceResults[0].race_title,
+        }
+        socket.emit('eligibilty',returnContent);
+
+    } catch (err) {
+        console.error(err);
+        // Handle error or emit an error event
+        socket.emit('eligibilty', false);
+    }
+}
+
+// Call this function wherever appropriate
+// checkEligibility(socket, electionRace);
 io.on('connection', function(socket) {
     //console.log("New Client has connected")
+    socket.on('requestVotingHistory', () => {
+        const voterId = socket.request.session.userId;
+        const query = 'SELECT CandidatesVoted FROM `voter-history` WHERE voter_id = ?';
+        db.query(query, [voterId], (err, results) => {
+            if (err) {
+                console.error(err);
+                socket.emit('votingHistoryResponse', { error: 'Database error' });
+                return;
+            }
+            if (results.length === 0) {
+                console.log('No voting history found for the user.');
+                socket.emit('votingHistoryResponse', { data: [] }); // Send empty array or handle as needed
+                return;
+            }
+            let votingHistory;
+            if (typeof results[0].CandidatesVoted === 'string') {
+                try {
+                    votingHistory = JSON.parse(results[0].CandidatesVoted);
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                    socket.emit('votingHistoryResponse', { error: 'Data parsing error' });
+                    return;
+                }
+            } else {
+                votingHistory = results[0].CandidatesVoted;
+            }
+
+            socket.emit('votingHistoryResponse', { data: votingHistory });
+        });
+    });
     const sql1 = `SELECT * FROM voters WHERE status='pending'`;
     db.query(sql1, (err, results) => {
         if(err) {
@@ -107,6 +194,58 @@ io.on('connection', function(socket) {
         }
         socket.emit('voterData', results);
     });
+    const sql2 = 'SELECT * FROM elections'
+    db.query(sql2, (err, results) => {
+        if(err) {
+            throw err;
+        }
+        socket.emit('electionsData', results);
+    });
+    socket.on('updateVoterHistory',(data)=>{
+        console.log(data);
+        const newVote = data.candidateInfo;
+        const voterId = socket.request.session.userId;
+        const query = 'SELECT CandidatesVoted FROM `voter-history` WHERE voter_id = ?';
+
+        db.query(query, [voterId], (err, results) => {
+            if (err) throw err;
+
+            let existingJsonArray = [];
+
+            if (results.length > 0) {
+                try {
+                    // Check if the data needs parsing
+                    if (typeof results[0].CandidatesVoted === 'string') {
+                        existingJsonArray = JSON.parse(results[0].CandidatesVoted);
+                    } else {
+                        // It's already an object
+                        existingJsonArray = results[0].CandidatesVoted;
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing JSON:', parseError);
+                    return;
+                }
+                existingJsonArray.push(newVote);
+
+                const updateQuery = 'UPDATE `voter-history` SET CandidatesVoted = ? WHERE voter_id = ?';
+                db.query(updateQuery, [JSON.stringify(existingJsonArray), voterId], (updateErr, updateResults) => {
+                    if (updateErr) throw updateErr;
+                    console.log('Updated voter history:', updateResults);
+                });
+            } else {
+                // No existing voting history, create new entry
+                const insertQuery = 'INSERT INTO `voter-history` (voter_id, CandidatesVoted) VALUES (?, ?)';
+                db.query(insertQuery, [voterId, JSON.stringify([newVote])], (insertErr, insertResults) => {
+                    if (insertErr) throw insertErr;
+                    console.log('Inserted new voter history:', insertResults);
+                });
+            }
+        });
+    })
+    socket.on('validateVoterWithRace',(electionRace)=>{
+        console.log(electionRace);
+        checkEligibility(socket,electionRace);
+    })
     socket.on('NewElection', (data)=>{
 
         const insertSql = 'INSERT INTO  elections (title, Race, Start_Time, End_Time) VALUES (?, ?, ?, ?)';

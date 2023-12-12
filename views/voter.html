@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Voter</title>
-    <style>        
+    <style>
+        table, th, td {
+            border: 1px solid black;
+        }
         #logoutButton {
             position: absolute;
             top: 10px;
@@ -23,5 +26,26 @@
     <p>VOTER MAIN PAGE</p>
     <button id="logoutButton">Logout</button>
     <button id="changeDetailsButton" onclick="window.location.href='/ChangeDetails'">Change Details</button>
+    <table id="electionsTable">
+        <tr>
+            <th>Name</th>
+            <th>Race</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+        </tr>
+    </table>
+    <div id="voteForm" style="display:none;">
+        <h3>Candidate Details</h3>
+        <p id="race"></p>
+        <select id="candidateSelect">
+
+        </select>
+
+        <!-- Add any other details you need here -->
+
+        <button onclick="submitVote()">Submit Vote</button>
+    </div>
+    <div id="votingHistory"></div>
 </body>
 </html>
