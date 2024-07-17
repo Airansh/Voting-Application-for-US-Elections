@@ -1,8 +1,18 @@
-# Sample GitLab Project
+# Voting Application for US Elections
 
-This sample project shows how a project in GitLab looks for demonstration purposes. It contains issues, merge requests and Markdown files in many branches,
-named and filled with lorem ipsum.
+This was our Fundamentals of Software Engineering project in which we developed a demo Voting Web Application for US Elections.
 
-You can look around to get an idea how to structure your project and, when done, you can safely delete this project.
+## Tech Stack
+Database – MySQL
+Frontend – HTML, CSS
+Backend – JavaScript, Node.js, Express.js
+Testing – Jasmine 
 
-[Learn more about creating GitLab projects.](https://docs.gitlab.com/ee/gitlab-basics/create-project.html)
+
+## Voters and Candidates
+This includes registering as a voter or candidate, voter identitiy verification, login and dashboards. 
+
+## Admin
+It also includes an admin panel for setting up elections and voting booth setup in different cities and counties. 
+The admin is also responsible for approving the voters before they can vote, or if they need to change their details it requires admin's approval.
+Admin can create, view and stop the elections.
