@@ -4,8 +4,13 @@ This was our Fundamentals of Software Engineering project in which we developed 
 
 ## Tech Stack
 Database – MySQL
+
 Frontend – HTML, CSS
-Backend – JavaScript, Node.js, Express.js
+
+Backend – JavaScript, Node.js 
+
+Server side development - Express.js
+
 Testing – Jasmine 
 
 
