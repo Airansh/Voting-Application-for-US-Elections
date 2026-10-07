@@ -1,63 +1,46 @@
+const socket = io();
+const requestForm = document.getElementById('request-form');
+const message = document.getElementById('request-message');
+setupServerErrors(socket, message);
 
-let socket = io.connect('http://localhost:3000');
-socket.emit('handshake','requestPage')
-console.log("hello")
-
-
-function request(){
-    const requestForm = document.getElementById("request-form")
-    const requestError = document.getElementById("request-error-msg")
-    const requestSuccess = document.getElementById("request-success-msg")
-    requestError.style.opacity = 0;
-    requestSuccess.style.opacity = 0;
-    let empty = false;
-    const firstName = requestForm.firstName.value;
-    const lastName = requestForm.lastName.value;
-    const age = requestForm.age.value;
-    const address = requestForm.address.value;
-    const city = requestForm.city.value;
-    const zipCode = requestForm.zipCode.value;
-    const id = requestForm.idNo.value;
-    const passport = requestForm.passport.value;
-    const email = requestForm.email.value;
-    if(email ==="" || passport ==="" ||id ==="" ||zipCode==="" ||city==="" ||
-        address==="" ||age==="" ||lastName==="" ||firstName===""){
-        empty = true
+// Mirrors the server-side checks so most mistakes are caught before submitting.
+function validate(data) {
+    const errors = [];
+    if (!data.first || !data.last || !data.address || !data.city || !data.id) {
+        errors.push('Please fill in every field');
     }
-    let valid_age = /^\d+$/.test(zipCode);
-    let valid_zip = /^\d+$/.test(age);
-    let valid_email = false;
-    if(email.match( /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)){
-       valid_email =true;
-    }
-    if(valid_zip && valid_age && valid_email &&  !empty){
-
-        let request = {
-            first : firstName,
-            last : lastName,
-            age : age,
-            address : address,
-            city : city,
-            zipCode : zipCode,
-            id : id,
-            passport : passport,
-            email : email
-        }
-        socket.emit('request',request);
-    }else{
-        requestError.style.opacity = 1;
-    }
-    socket.on('validation',(data)=>{
-        if(data.valid === "0"){
-            requestError.style.opacity = 1;
-        }else if(data.valid ==="1"){
-            requestSuccess.style.opacity = 1;
-        }else{
-            console.log("issue!")
-        }
-    })
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.push('Please enter a valid email address');
+    if (!/^\d{5}$/.test(data.zipCode)) errors.push('Zip code must be 5 digits');
+    const age = parseInt(data.age, 10);
+    if (!(age >= 18 && age <= 130)) errors.push('You must be at least 18 years old to register');
+    return errors;
 }
 
+requestForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const data = {
+        first: requestForm.firstName.value.trim(),
+        last: requestForm.lastName.value.trim(),
+        age: requestForm.age.value.trim(),
+        address: requestForm.address.value.trim(),
+        city: requestForm.city.value.trim(),
+        zipCode: requestForm.zipCode.value.trim(),
+        id: requestForm.idNo.value.trim(),
+        email: requestForm.email.value.trim(),
+    };
+    const errors = validate(data);
+    if (errors.length) {
+        showMessage(message, errors, 'error');
+        return;
+    }
+    socket.emit('request', data);
+});
 
-
-
+socket.on('validation', function (data) {
+    if (data.valid === '1') {
+        requestForm.reset();
+        showMessage(message, 'Request submitted! You will receive an email once an administrator approves it.', 'success');
+    } else {
+        showMessage(message, data.errors || 'Invalid request.', 'error');
+    }
+});

@@ -9,7 +9,7 @@
             "request": "launch",
             "runtimeArgs": [
                 "run-script",
-                "debug"
+                "start"
             ],
             "runtimeExecutable": "npm",
             "skipFiles": [
@@ -26,7 +26,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "mysqlConnect.js"
+            "program": "${workspaceFolder}/server.js"
         }
     ]
 }

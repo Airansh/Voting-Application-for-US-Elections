@@ -2,50 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Voter</title>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-        }
-        #logoutButton {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        #changeDetailsButton {
-            position: absolute;
-            top: 40px;
-            right: 10px;
-        }
-    </style>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="../public/static/voter.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter dashboard | US Elections Voting</title>
+    <link rel="stylesheet" href="/public/static/styles.css">
 </head>
 <body>
-    <p>VOTER MAIN PAGE</p>
-    <button id="logoutButton">Logout</button>
-    <button id="changeDetailsButton" onclick="window.location.href='/ChangeDetails'">Change Details</button>
-    <table id="electionsTable">
-        <tr>
-            <th>Name</th>
-            <th>Race</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Status</th>
-        </tr>
-    </table>
-    <div id="voteForm" style="display:none;">
-        <h3>Candidate Details</h3>
-        <p id="race"></p>
-        <select id="candidateSelect">
-
-        </select>
-
-        <!-- Add any other details you need here -->
-
-        <button onclick="submitVote()">Submit Vote</button>
+<header class="topbar">
+    <a href="/Voter">US Elections Voting</a>
+    <div class="actions">
+        <a class="button" id="changeDetailsButton" href="/ChangeDetails">Change details</a>
+        <button id="logoutButton">Log out</button>
     </div>
-    <div id="votingHistory"></div>
+</header>
+<main>
+    <section class="card">
+        <h1 id="welcome">Voter dashboard</h1>
+        <p id="profile" class="muted"></p>
+        <div id="message" class="message" role="alert"></div>
+    </section>
+    <section class="card">
+        <h2>Elections</h2>
+        <div class="table-wrap">
+            <table id="electionsTable">
+                <thead>
+                    <tr><th>Name</th><th>Race</th><th>Start</th><th>End</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+    <section class="card" id="voteForm" hidden>
+        <h2>Cast your ballot</h2>
+        <p id="race"></p>
+        <form id="ballot">
+            <label for="candidateSelect">Candidate</label>
+            <select id="candidateSelect" required></select>
+            <button type="submit">Submit vote</button>
+            <button type="button" class="secondary" id="cancelVote">Cancel</button>
+        </form>
+    </section>
+    <section class="card">
+        <h2>Your voting history</h2>
+        <div class="table-wrap">
+            <table id="votingHistory">
+                <thead><tr><th>Race</th><th>Candidate</th><th>Party</th><th>Voted at</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/public/static/common.js"></script>
+<script src="/public/static/voter.js"></script>
 </body>
 </html>
