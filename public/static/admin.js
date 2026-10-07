@@ -1,161 +1,180 @@
+const socket = io();
+const message = document.getElementById('message');
+setupServerErrors(socket, message);
+setupLogout();
 
-var socket = io.connect('http://localhost:3000');
+socket.on('adminActionResult', function (result) {
+    showMessage(message, result.message, result.ok ? 'success' : 'error');
+    if (result.ok && result.action === 'NewRace') {
+        document.getElementById('raceForm').reset();
+        resetCandidates();
+    } else if (result.ok && result.action === 'NewElection') {
+        document.getElementById('electionForm').reset();
+    } else if (result.ok && result.action === 'NewPrecinct') {
+        document.getElementById('precinctForm').reset();
+    }
+});
 
-socket.on('voterData', function (data) {
-    var table = document.getElementById('votersTable');
-    data.forEach(function(voter) {
-        var row = table.insertRow(-1);
-        var cell1 = row.insertCell(0);
-        var cell2 = row.insertCell(1);
-        var cell3 = row.insertCell(2);
-        var cell4 = row.insertCell(3);
-        var cell5 = row.insertCell(4);
-        var cell6 = row.insertCell(5);
-        var cell7 = row.insertCell(6);
-        var cell8 = row.insertCell(7);
-        var cell9 = row.insertCell(8);
-        var cell10 = row.insertCell(9);
+// ----- Pending voters -------------------------------------------------------
 
-        cell1.innerHTML = voter.email_id;
-        cell2.innerHTML = voter.first_name;
-        cell3.innerHTML = voter.last_name;
-        cell4.innerHTML = voter.address;
-        cell5.innerHTML = voter.city;
-        cell6.innerHTML = voter.zipcode;
-        cell7.innerHTML = voter.age;
-        cell8.innerHTML = voter.driving_license;
-        cell9.innerHTML = "<button onclick='approveVoter("+voter.voter_id+")'>Approve</button>";
-        cell10.innerHTML = "<button onclick='denyVoter("+voter.voter_id+")'>Deny</button>";
+socket.on('voterData', function (voters) {
+    const tbody = document.querySelector('#votersTable tbody');
+    tbody.innerHTML = '';
+    if (!voters.length) {
+        showEmptyRow(tbody, 9, 'No pending requests.');
+        return;
+    }
+    voters.forEach(function (voter) {
+        const actions = document.createElement('div');
+        actions.className = 'row';
+        actions.appendChild(makeButton('Approve', function () {
+            socket.emit('approveVoter', voter.email_id);
+        }, 'small'));
+        actions.appendChild(makeButton('Deny', function () {
+            if (confirm('Deny the request from ' + voter.email_id + '?')) {
+                socket.emit('denyVoter', voter.email_id);
+            }
+        }, 'small danger'));
+        appendRow(tbody, [voter.email_id, voter.first_name, voter.last_name, voter.address,
+            voter.city, voter.zipcode, voter.age, voter.driving_license, actions]);
     });
 });
 
-function approveVoter(voter_id) {
-    socket.emit('approveVoter', voter_id);
-}
+// ----- Search ---------------------------------------------------------------
 
-function denyVoter(voter_id) {
-    socket.emit('denyVoter', voter_id);
-}
-document.getElementById('logoutButton').addEventListener('click', function() {
-    if(confirm('Are you sure you want to logout?')) {
-        // Emit the 'Logout' event to the server
-        socket.emit('Logout');
+document.getElementById('searchForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    socket.emit('searchVoter', {
+        criteria: document.getElementById('searchCriteria').value,
+        value: document.getElementById('searchValue').value.trim(),
+    });
+});
 
-        // Redirect to the login page after the session is destroyed
-        socket.on('loggedOut', function() {
-            window.location.href = '/Login';
+socket.on('searchResults', function (voters) {
+    const tbody = document.querySelector('#searchTable tbody');
+    tbody.innerHTML = '';
+    if (!voters.length) {
+        showEmptyRow(tbody, 9, 'No voters found.');
+        return;
+    }
+    voters.forEach(function (voter) {
+        appendRow(tbody, [voter.email_id, voter.first_name, voter.last_name, voter.address,
+            voter.city, voter.zipcode, voter.age, voter.driving_license, voter.status]);
+    });
+});
+
+// ----- Elections and races --------------------------------------------------
+
+socket.on('electionsData', function (elections) {
+    const tbody = document.querySelector('#electionsTable tbody');
+    tbody.innerHTML = '';
+    if (!elections.length) {
+        showEmptyRow(tbody, 6, 'No elections yet.');
+        return;
+    }
+    elections.forEach(function (election) {
+        const canClose = election.status === 'active' || election.status === 'upcoming';
+        const action = canClose ? makeButton('Close', function () {
+            if (confirm('Close "' + election.title + '"? Voters will no longer be able to vote in it.')) {
+                socket.emit('closeElection', election.title);
+            }
+        }, 'small danger') : '';
+        appendRow(tbody, [election.title, election.Race, formatDateTime(election.Start_Time),
+            formatDateTime(election.End_Time), statusBadge(election.status), action]);
+    });
+});
+
+socket.on('racesData', function (races) {
+    const select = document.getElementById('races');
+    select.innerHTML = '';
+    races.forEach(function (race) {
+        const option = document.createElement('option');
+        option.value = race.race_title;
+        option.textContent = race.race_title + ' (' + race.zipcode + ')';
+        select.appendChild(option);
+    });
+});
+
+socket.on('electionResults', function (results) {
+    const container = document.getElementById('results');
+    container.innerHTML = '';
+    if (!results.length) {
+        container.textContent = 'No races yet.';
+        return;
+    }
+    results.forEach(function (race) {
+        const heading = document.createElement('h3');
+        heading.textContent = race.race + ' (' + race.totalVotes + (race.totalVotes === 1 ? ' vote)' : ' votes)');
+        container.appendChild(heading);
+        const table = document.createElement('table');
+        const tbody = table.createTBody();
+        race.candidates.forEach(function (candidate) {
+            const share = race.totalVotes ? Math.round(candidate.votes * 100 / race.totalVotes) : 0;
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            bar.style.width = share + '%';
+            appendRow(tbody, [candidate.name, candidate.party, candidate.votes, share + '%', bar]);
         });
-    }
-});
-
-socket.on('voterStatusUpdated', function() {
-    location.reload();
-});
-document.getElementById('searchForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevents the default form submission
-
-    const selectedCriteria = document.getElementById('searchCriteria').value;
-    const searchInput = document.getElementById('searchValue').value;
-
-    console.log('Selected Criteria:', selectedCriteria);
-    console.log('Search Value:', searchInput);
-    let data = {
-      criteria:selectedCriteria,
-      value:searchInput
-    };
-    let table = document.getElementById("searchTable");
-    for (let i = table.rows.length -1; i >0; i--){
-        table.deleteRow(i);
-    }
-    socket.emit('searchVoter',data)
-});
-socket.on('searchResults',function (data){
-
-    console.log("recieved!")
-    const table = document.getElementById('searchTable');
-    data.forEach(function(voter) {
-        let row = table.insertRow(-1);
-        let cell1 = row.insertCell(0);
-        let cell2 = row.insertCell(1);
-        let cell3 = row.insertCell(2);
-        let cell4 = row.insertCell(3);
-        var cell5 = row.insertCell(4);
-        var cell6 = row.insertCell(5);
-        var cell7 = row.insertCell(6);
-        var cell8 = row.insertCell(7);
-
-        cell1.innerHTML = voter.email_id;
-        cell2.innerHTML = voter.first_name;
-        cell3.innerHTML = voter.last_name;
-        cell4.innerHTML = voter.address;
-        cell5.innerHTML = voter.city;
-        cell6.innerHTML = voter.zipcode;
-        cell7.innerHTML = voter.age;
-        cell8.innerHTML = voter.driving_license;
+        container.appendChild(table);
     });
 });
-socket.on('connect', function() {
-    console.log('Connected to server');
+
+document.getElementById('refreshResults').addEventListener('click', function () {
+    socket.emit('requestResults');
 });
 
-function NewPrecinct(){
+// ----- Creation forms -------------------------------------------------------
 
-    let zipCode = document.getElementById("zipCode").value
-    let lastFourDigits = document.getElementById("lastFourDigits").value
-    let votingLocation = document.getElementById("votingLocation").value
-    let pollingManager = document.getElementById("pollingManager").value
-    let stateElectionContact = document.getElementById("stateElectionContact").value
-
-    let data = {
-        zipCode : zipCode,
-        lastFourDigits : lastFourDigits,
-        votingLocation : votingLocation,
-        pollingManager : pollingManager,
-        stateElectionContact : stateElectionContact,
-    }
-    console.log(data);
-    socket.emit('NewPrecinct', data);
+function addCandidate() {
+    const entry = document.createElement('div');
+    entry.className = 'candidateEntry row';
+    entry.innerHTML = '<input type="text" name="candidateName" placeholder="Candidate name" required>'
+        + '<input type="text" name="candidateParty" placeholder="Party" required>';
+    document.getElementById('candidatesContainer').appendChild(entry);
 }
-function NewElection(){
 
-    let electionTitle = document.getElementById("electionTitle").value
-    let races = document.getElementById("races").value
-    let startTime = document.getElementById("startTime").value
-    let endTime = document.getElementById("endTime").value
-
-    let data = {
-        electionTitle : electionTitle,
-        races : races,
-        startTime : startTime,
-        endTime : endTime
-        }
-    socket.emit('NewElection', data);
+function resetCandidates() {
+    document.getElementById('candidatesContainer').innerHTML = '';
+    addCandidate();
 }
-function NewRace(){
-    const raceTitle = document.getElementById('raceTitle').value;
-    const precinctZipCode = document.getElementById('precinctZipCode').value;
 
-    const candidateEntries = document.querySelectorAll('.candidateEntry');
-    const candidatesData = [];
+document.getElementById('addCandidate').addEventListener('click', addCandidate);
+resetCandidates();
 
-    candidateEntries.forEach((entry) => {
-        const candidateName = entry.querySelector('input[name="candidateName[]"]').value;
-        const candidateParty = entry.querySelector('input[name="candidateParty[]"]').value;
-
-        candidatesData.push({
-            name: candidateName,
-            party: candidateParty
-        });
+document.getElementById('precinctForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    socket.emit('NewPrecinct', {
+        zipCode: document.getElementById('zipCode').value.trim(),
+        lastFourDigits: document.getElementById('lastFourDigits').value.trim(),
+        votingLocation: document.getElementById('votingLocation').value.trim(),
+        pollingManager: document.getElementById('pollingManager').value.trim(),
+        stateElectionContact: document.getElementById('stateElectionContact').value.trim(),
     });
+});
 
-    // Convert candidatesData to JSON format
-    const candidatesJSON = JSON.stringify(candidatesData);
+document.getElementById('raceForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const candidates = Array.from(document.querySelectorAll('.candidateEntry')).map(function (entry) {
+        return {
+            name: entry.querySelector('input[name="candidateName"]').value.trim(),
+            party: entry.querySelector('input[name="candidateParty"]').value.trim(),
+        };
+    });
+    socket.emit('NewRace', {
+        raceTitle: document.getElementById('raceTitle').value.trim(),
+        precinctZipCode: document.getElementById('precinctZipCode').value.trim(),
+        candidates: candidates,
+    });
+});
 
-    const formData = {
-        raceTitle: raceTitle,
-        precinctZipCode: precinctZipCode,
-        candidates: candidatesJSON
-    };
-    console.log(formData);
-    socket.emit('NewRace', formData);
-}
+document.getElementById('electionForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    socket.emit('NewElection', {
+        electionTitle: document.getElementById('electionTitle').value.trim(),
+        races: document.getElementById('races').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+    });
+});
+
+socket.emit('requestResults');

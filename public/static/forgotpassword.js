@@ -1,22 +1,15 @@
-let socket = io.connect('http://localhost:3000');
-socket.emit('handshake','requestPage')
-console.log("hello")
+const socket = io();
+const message = document.getElementById('message');
+setupServerErrors(socket, message);
 
-function forgotPassword(){
-    let voterID = document.getElementById("ID").value
-    let emailID = document.getElementById("Email").value
-    let data = {
-        email : emailID,
-        voterID : voterID
-    }
-    socket.emit('ForgotPassword',data);
-}
-socket.on('validationForgotPassword',(data)=>{
-    if(data.valid === "0"){
-        window.alert("Invalid Entry!")
-    }else if(data.valid ==="1"){
-        window.alert("Success!")
-    }else{
-        console.log("issue!")
-    }
-})
+document.getElementById('forgotPasswordForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    socket.emit('ForgotPassword', {
+        voterID: document.getElementById('ID').value.trim(),
+        email: document.getElementById('Email').value.trim(),
+    });
+});
+
+socket.on('validationForgotPassword', function (data) {
+    showMessage(message, data.message, data.valid === '1' ? 'success' : 'error');
+});

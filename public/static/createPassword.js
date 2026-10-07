@@ -1,16 +1,30 @@
 const socket = io();
+const message = document.getElementById('message');
+const form = document.getElementById('createPasswordForm');
+const token = new URLSearchParams(window.location.search).get('token');
+setupServerErrors(socket, message);
 
-document.getElementById('createPasswordForm').addEventListener('submit', function(event) {
+if (!token) {
+    showMessage(message, 'This page must be opened from the link in your email.', 'error');
+    form.querySelector('button').disabled = true;
+}
+
+form.addEventListener('submit', function (event) {
     event.preventDefault();
-    const voterId = document.getElementById('voterId').value;
     const password = document.getElementById('password').value;
-    socket.emit('createPassword', { voterId, password });
+    if (password !== document.getElementById('confirmPassword').value) {
+        showMessage(message, 'Passwords do not match.', 'error');
+        return;
+    }
+    socket.emit('createPassword', { token: token, password: password });
 });
 
-socket.on('passwordUpdated', function() {
-    alert('Password updated successfully');
+socket.on('passwordUpdated', function (data) {
+    form.reset();
+    form.querySelector('button').disabled = true;
+    showMessage(message, 'Password saved for voter ' + data.voterId + '. You can now log in.', 'success');
 });
 
-socket.on('passwordUpdateFailed', function() {
-    alert('Failed to update password. Please check your voter ID or if your password is already set.');
+socket.on('passwordUpdateFailed', function (data) {
+    showMessage(message, data.message, 'error');
 });

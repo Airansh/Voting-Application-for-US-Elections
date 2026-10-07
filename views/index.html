@@ -2,28 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Voting Software</title>
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
-    <script src="/public/static/script.js"></script>
-<!--    <script src="mysqlConnect.js"></script>-->
-
-    <style>
-
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | US Elections Voting</title>
+    <link rel="stylesheet" href="/public/static/styles.css">
 </head>
 <body>
-    <div>
-        <p>Home Page</p>
-        <div>
-            <a href="http://localhost:3000/login">
-                <button id = "login" class = "login">Login</button>
-            </a>
-            <a href = "http://localhost:3000/RequestAccount">
-                <button id = "RequestAccount" class = "RequestAccount">Request Account</button>
-            </a>
-
-        </div>
-
-    </div>
+<header class="topbar"><a href="/">US Elections Voting</a></header>
+<main class="narrow">
+    <section class="card">
+        <h1>Welcome</h1>
+        <p>Register to vote, check your eligibility and cast your ballot in local US elections.</p>
+        <a class="button" href="/Login">Log in</a>
+        <a class="button secondary" href="/RequestAccount">Request an account</a>
+    </section>
+    <section class="card">
+        <h2>How it works</h2>
+        <ol>
+            <li>Request an account with your address and ID details.</li>
+            <li>An election administrator verifies and approves your request.</li>
+            <li>You receive your voter ID by email with a link to create a password.</li>
+            <li>Log in and vote in the races for your precinct while they are open.</li>
+        </ol>
+    </section>
+</main>
 </body>
 </html>

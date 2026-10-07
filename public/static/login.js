@@ -1,27 +1,21 @@
+const socket = io();
+const message = document.getElementById('message');
+setupServerErrors(socket, message);
 
-socket.emit('handshake','frontend')
-console.log("hello")
-document.getElementById('loginForm').addEventListener('submit', function(event) {
+document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    const voterId = document.getElementById('voterId').value;
-    const password = document.getElementById('password').value;
-    console.log("sending data")
-    socket.emit('login', { voterId, password });
-});
-socket.on('loginSuccess',(data)=> {
-    alert('Successful login for user ' + data.user + ", role:" + data.role);
-    console.log(data.role)
-    if(data.role == "admin"){
-        console.log("help")
-        location.href = 'http://localhost:3000/admin'}
-    else if(data.role == "manager"){
-        console.log("help")
-        location.href = 'http://localhost:3000/manager'
-    }else if(data.role === "voter"){
-        location.replace('https://localhost/voter');
-    }
+    hideMessage(message);
+    socket.emit('login', {
+        voterId: document.getElementById('voterId').value.trim(),
+        password: document.getElementById('password').value,
+    });
 });
 
-socket.on('loginFailed', function() {
-    alert('Invalid Login');
+socket.on('loginSuccess', function (data) {
+    showMessage(message, 'Logged in as ' + data.user + '. Redirecting...', 'success');
+    window.location.href = data.redirect;
+});
+
+socket.on('loginFailed', function () {
+    showMessage(message, 'Invalid voter ID or password.', 'error');
 });

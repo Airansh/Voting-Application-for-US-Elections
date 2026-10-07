@@ -1,74 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        form {
-            width: 300px;
-            margin: 0 auto;
-        }
-        label, input {
-            display: block;
-            margin-bottom: 10px;
-        }
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-        }
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-    </style>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
-  <script src="/public/static/script.js"></script>
-<!--  <script src="mysqlConnect.js"></script>-->
-<!--    <script src = "/public/static/login.js"></script>-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in | US Elections Voting</title>
+    <link rel="stylesheet" href="/public/static/styles.css">
 </head>
 <body>
-    <div>
-        <h2>Login</h2>
+<header class="topbar"><a href="/">US Elections Voting</a></header>
+<main class="narrow">
+    <section class="card">
+        <h1>Log in</h1>
         <form id="loginForm">
-            <label for="voterId">Voter ID:</label><br>
-            <input type="text" id="voterId" name="voterId" required><br>
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password" required><br>
-            <input type="submit" value="Submit">
+            <label for="voterId">Voter ID</label>
+            <input type="text" id="voterId" name="voterId" autocomplete="username" required>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="current-password" required>
+            <button type="submit">Log in</button>
         </form>
-        <script>
-
-            socket.emit('handshake','frontend')
-            console.log("hello")
-            document.getElementById('loginForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const voterId = document.getElementById('voterId').value;
-                const password = document.getElementById('password').value;
-                console.log("sending data")
-                socket.emit('login', { voterId, password });
-            });
-            socket.on('loginSuccess',(data)=> {
-                alert('Successful login for user ' + data.user + ", role:" + data.role);
-                console.log(data.role)
-                if(data.role == "admin"){
-                    location.href = 'http://localhost:3000/admin'
-                }else if(data.role == "voter"){
-                    location.href ='http://localhost:3000/Voter'
-                }
-            });
-
-            socket.on('loginFailed', function() {
-                alert('Invalid Login');
-            });
-        </script>
-        <a href="http://localhost:3000/ForgotPassword">
-            <button id = "ForgotPassword" class = "ForgotPassword">Forgot Password </button>
-        </a>
-    </div>
+        <div id="message" class="message" role="alert"></div>
+        <div class="links">
+            <a href="/ForgotPassword">Forgot password?</a>
+            <a href="/RequestAccount">Request an account</a>
+        </div>
+    </section>
+</main>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/public/static/common.js"></script>
+<script src="/public/static/login.js"></script>
 </body>
 </html>
